@@ -18,8 +18,8 @@ export function toMeters(astronomicalunits: number): number {
     return astronomicalunits * 149597870700;
 }
 
-export function secondsToDays(seconds: number): number {
-    return seconds / 60 / 60 / 24;
+export function secondsToDays(seconds: number, daySecondDuration: number = 86400): number {
+    return seconds / daySecondDuration;
 }
 
 /**
