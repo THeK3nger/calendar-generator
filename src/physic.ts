@@ -1,9 +1,11 @@
 export const G: number = 6.674e-11;
 
+export const sun_mass = 1.989e30;
 export const earth_mass = 5.972e24;
 export const moon_mass = 7.348e22;
 
 /** AXIS MAJOR CONSTANTS */
+export const earth_axmj = 149598023e3;
 export const moon_axmj = 384399e03;
 
 /** CONVERTION */
@@ -14,6 +16,10 @@ export function toAstronomicalUnit(meters: number): number {
 
 export function toMeters(astronomicalunits: number): number {
     return astronomicalunits * 149597870700;
+}
+
+export function secondsToDays(seconds: number): number {
+    return seconds / 60 / 60 / 24;
 }
 
 /**
