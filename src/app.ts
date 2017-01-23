@@ -1,3 +1,5 @@
+import * as $ from "jquery"
+
 import * as Physic from "physic"
 
 type Moon = { mass: number, axis_major: number }
@@ -21,27 +23,27 @@ function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<n
     let year_days = Math.floor(year_days_full);
     if (planetToEarthDays != 1) {
         let earth_days = Math.floor(year_days_full * planetToEarthDays);
-        console.log(`Generating a calendar for a planet with a year of ${year_days} days (${earth_days} Earth Days).`);
+        writeLine(`Generating a calendar for a planet with a year of ${year_days} days (${earth_days} Earth Days).`);
     } else {
-        console.log(`Generating a calendar for a planet with a year of ${year_days} days`);
+        writeLine(`Generating a calendar for a planet with a year of ${year_days} days`);
     }
     let planet_cf = continuedFractions(year_days_full, 3);
     let third_convergent = thirdOrderConvergent(planet_cf);
-    console.log(`Calendar has approximately ${third_convergent[0]} leap days every ${third_convergent[1]} years.`);
+    writeLine(`Calendar has approximately ${third_convergent[0]} leap days every ${third_convergent[1]} years.`);
     if (moon_periods.length > 0) {
-        console.log(`There are ${moon_periods.length} moons. Using principal moon.`);
+        writeLine(`There are ${moon_periods.length} moons. Using principal moon.`);
         let moon_day_period = Physic.secondsToDays(moon_periods[0], planetDayDuration);
         if (planetToEarthDays != 1) {
             let moon_earth_days = Math.floor(moon_day_period * planetToEarthDays);
-            console.log(`Principal Moon Period is ${moon_day_period} (almost ${moon_earth_days} Earth Days)`);
+            writeLine(`Principal Moon Period is ${moon_day_period} (almost ${moon_earth_days} Earth Days)`);
         }else {
-            console.log(`Principal Moon Period is ${moon_day_period}`);
+            writeLine(`Principal Moon Period is ${moon_day_period}`);
         }
         let month_days = Math.floor(Physic.secondsToDays(moon_periods[0], planetDayDuration));
         let lunar_months = Math.floor(year_days / month_days);
         let days_remainder = year_days - lunar_months * month_days;
-        console.log(`Based on the principal satellite, we can subdivide the year into ${lunar_months} lunar months.`);
-        console.log(`This left ${days_remainder} days to be distributed.`);
+        writeLine(`Based on the principal satellite, we can subdivide the year into ${lunar_months} lunar months.`);
+        writeLine(`This left ${days_remainder} days to be distributed.`);
     }
 }
 
@@ -66,6 +68,43 @@ function notEarthDay(dayDuration: number): boolean {
     return dayDuration != 86400;
 }
 
+function handleForm() {
+    console.log("Click Received. Starting Calendar Generation.");
+    let star_mass = parseFloat($("#starmass").val());
+    let planet_mass = parseFloat($("#planetmass").val());
+    let planet_axismajor = parseFloat($("#planetaxismajor").val()) * 1000;
+    let moon_mass = parseFloat($("#moonmass").val());
+    let moon_axismajor = parseFloat($("#moonaxismajor").val()) * 1000;
+    let day_duration = parseFloat($("#dayduration").val());
+    clear();
+    generateCalendarFromOrbit(planet_axismajor, planet_mass, star_mass, [{ mass: moon_mass, axis_major: moon_axismajor }], day_duration);
+}
+
+/** 
+ * Write a line in the output Div.
+ */
+function writeLine(message: string) {
+    $("#calendar-description").append(`<p>${message}<\p>`);
+}
+
+/**
+ * Clear output div.
+ */
+function clear() {
+    $("#calendar-description p").remove();
+}
+
+function init() {
+    console.log("I ADD CLICK");
+    $("#generateButton").click(handleForm);
+    $("#starmass").val(Physic.sun_mass);
+    $("#planetmass").val(Physic.earth_mass);
+    $("#planetaxismajor").val(Physic.earth_axmj/1000);
+    $("#moonmass").val(Physic.moon_mass);
+    $("#moonaxismajor").val(Physic.moon_axmj/1000);
+    $("#dayduration").val(86400);
+}
+
 // --------------- //
 
-generateCalendarFromOrbit(Physic.earth_axmj, Physic.earth_mass, Physic.sun_mass, [{ mass: Physic.moon_mass, axis_major: Physic.moon_axmj }], 80000);
+init();

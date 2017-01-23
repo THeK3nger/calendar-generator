@@ -1,6 +1,7 @@
 <!doctype html>
 
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
 
@@ -8,12 +9,55 @@
   <meta name="description" content="The HTML5 Herald">
   <meta name="author" content="SitePoint">
 
-  <script data-main="app" src="require.js"></script>
+  <script data-main="main" src="require.js"></script>
 
   <link rel="stylesheet" href="css/styles.css?v=1.0">
 </head>
 
 <body>
-
+  <div id="generator">
+    <div id="input">
+      <form id="formInputs">
+        <p>
+          Star Mass (Kg):
+          <input type="text" id="starmass">
+        </p>
+        <p>
+          Planet Mass (Kg):
+          <input type="text" id="planetmass">
+        </p>
+        <p>
+          Planet Major-Semi-Axis (Km):
+          <input type="text" id="planetaxismajor">
+        </p>
+        <p>
+          Planet's Day Duration in Seconds:
+          <input type="number" id="dayduration">
+        </p>
+        <p>
+          Moon Mass (Kg):
+          <input type="text" id="moonmass">
+        </p>
+        <p>
+          Moon Major-Semi-Axis (Km):
+          <input type="text" id="moonaxismajor">
+        </p>
+        <p><button id="generateButton" type="button">Generate</button></p>
+      </form>
+    </div>
+    <div>
+      <h2>Calendar Description</h2>
+      <div id="calendar-description">
+      </div>
+    </div>
+  </div>
+  <div i="changelog">
+    <h3>Changelog</h3>
+    <h4>Version 0.1</h4>
+    <ul>
+      <li>First Basic Version</li>
+    </ul>
+  </div>
 </body>
+
 </html>
