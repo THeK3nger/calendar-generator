@@ -36,7 +36,7 @@ function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<n
         if (planetToEarthDays != 1) {
             let moon_earth_days = Math.floor(moon_day_period * planetToEarthDays);
             writeLine(`Principal Moon Period is ${moon_day_period} (almost ${moon_earth_days} Earth Days)`);
-        }else {
+        } else {
             writeLine(`Principal Moon Period is ${moon_day_period}`);
         }
         let month_days = Math.floor(Physic.secondsToDays(moon_periods[0], planetDayDuration));
@@ -44,7 +44,33 @@ function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<n
         let days_remainder = year_days - lunar_months * month_days;
         writeLine(`Based on the principal satellite, we can subdivide the year into ${lunar_months} lunar months.`);
         writeLine(`This left ${days_remainder} days to be distributed.`);
+        instantiateCalendar(year_days, third_convergent[0], third_convergent[1], month_days, lunar_months, 7 );
     }
+}
+
+function instantiateCalendar(year_days: number, leap: number, leap_period: number, month_base_days: number, months: number, week_days: number) {
+    // For now names of days, months and other are just described with D1, M2, and so on...
+    let days_remainder = year_days - months * month_base_days;
+    let days_per_month = [];
+    for (let i = 0; i < months; i++) {
+        days_per_month.push(month_base_days);
+    }
+    for (let i = 0; i < days_remainder; i++) {
+        days_per_month[Math.floor(Math.random()*months)] += 1;
+    }
+    console.log("[DEBUG] Days per Month: ")
+    console.log(days_per_month);
+
+    let week_d = 0
+    for (let m = 0; m < months; m++) {
+        let month_string = "";
+        for (let d = 0; d< days_per_month[m]; d++) {
+            month_string += `D${(week_d % week_days)+1} ${d+1} `;
+            week_d++;
+        }
+        let month_p = $("#calendar-example").append(`<p>M${m}: ${month_string}</p>`);
+    }
+
 }
 
 function continuedFractions(num: number, order: number): Array<number> {
@@ -99,9 +125,9 @@ function init() {
     $("#generateButton").click(handleForm);
     $("#starmass").val(Physic.sun_mass);
     $("#planetmass").val(Physic.earth_mass);
-    $("#planetaxismajor").val(Physic.earth_axmj/1000);
+    $("#planetaxismajor").val(Physic.earth_axmj / 1000);
     $("#moonmass").val(Physic.moon_mass);
-    $("#moonaxismajor").val(Physic.moon_axmj/1000);
+    $("#moonaxismajor").val(Physic.moon_axmj / 1000);
     $("#dayduration").val(86400);
 }
 
