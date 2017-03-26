@@ -131,6 +131,8 @@ function generateMonthTableContents(month_table: JQuery, starting_week_day: numb
 }
 
 function instantiateCalendar(calendar_parameter: CalendarParameters, days_per_week: number) {
+    $("#calendar-example div").remove(); 
+
     const year_days = calendar_parameter.days_per_year;
     const months = calendar_parameter.months_per_year;
     const month_base_days = calendar_parameter.base_days_per_month;
