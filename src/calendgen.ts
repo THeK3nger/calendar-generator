@@ -72,7 +72,7 @@ function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<n
         let lunar_months = Math.floor(year_days / month_days);
         let days_remainder = year_days - lunar_months * month_days;
         calendar_description.push(`Based on the principal satellite, we can subdivide the year into ${lunar_months} lunar months.`);
-        calendar_description.push(`This left ${days_remainder} days to be distributed.`);
+        calendar_description.push(`This leaves us with ${days_remainder} days to be distributed.`);
 
         output_parameters = {
             days_per_year: year_days,
