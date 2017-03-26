@@ -7,12 +7,17 @@ function handleForm() {
     console.log("Click Received. Starting Calendar Generation.");
     let star_mass = parseFloat($("#starmass").val());
     let planet_mass = parseFloat($("#planetmass").val());
-    let planet_axismajor = parseFloat($("#planetaxismajor").val()) * 1000;
+    let planet_axis_major = parseFloat($("#planetaxismajor").val()) * 1000;
     let moon_mass = parseFloat($("#moonmass").val());
-    let moon_axismajor = parseFloat($("#moonaxismajor").val()) * 1000;
+    let moon_axis_major = parseFloat($("#moonaxismajor").val()) * 1000;
     let day_duration = parseFloat($("#dayduration").val());
     clear();
-    let result = CalendGen.generateCalendarFromOrbit(planet_axismajor, planet_mass, star_mass, [{ mass: moon_mass, axis_major: moon_axismajor }], day_duration);
+    let planet_data = {
+        "axis_major": planet_axis_major,
+        "mass": planet_mass,
+        "day_duration": day_duration
+    };
+    let result = CalendGen.generateCalendarFromOrbit(planet_data, star_mass, [{ mass: moon_mass, axis_major: moon_axis_major }]);
     for (let s of result.description) {
         writeLine(s);
     }

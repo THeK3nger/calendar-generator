@@ -1,9 +1,11 @@
 import * as Physic from "physic"
 
-interface Moon {
-    mass: number,
-    axis_major: number
+interface MoonData {
+    axis_major: number,
+    mass: number
 }
+
+interface PlanetData { axis_major: number, mass: number, day_duration: number }
 
 interface LeapYearData { leap_total_days: number, leap_period: number }
 
@@ -19,7 +21,11 @@ interface CalendarGeneratorOutput {
     calendar_parameters: CalendarParameters
 };
 
-export function generateCalendarFromOrbit(planet_axis_major: number, planet_mass: number, sun_mass: number, moons: Array<Moon>, planetDayDuration: number = 86400): CalendarGeneratorOutput {
+export function generateCalendarFromOrbit(planet_data: PlanetData, sun_mass: number, moons: Array<MoonData>): CalendarGeneratorOutput {
+    const planet_axis_major = planet_data.axis_major;
+    const planet_mass = planet_data.mass;
+    const planet_day_duration = planet_data.day_duration;
+
     // Compute planet orbital period.
     let planet_year = Physic.orbital_period(sun_mass, planet_axis_major, planet_mass, );
 
@@ -29,14 +35,14 @@ export function generateCalendarFromOrbit(planet_axis_major: number, planet_mass
         moon_periods.push(Physic.orbital_period(planet_mass, moon.axis_major, moon.mass));
     }
 
-    return generateCalendarFromPeriod(planet_year, moon_periods, planetDayDuration);
+    return generateCalendarFromPeriod(planet_year, moon_periods, planet_day_duration);
 }
 
-function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<number>, planetDayDuration: number = 86400): CalendarGeneratorOutput {
+function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<number>, planet_day_duration: number = 86400): CalendarGeneratorOutput {
     let calendar_description = [];
 
-    let planetToEarthDays = planetDayDuration / 86400;
-    let year_days_full = Physic.secondsToDays(planet_period, planetDayDuration);
+    let planetToEarthDays = planet_day_duration / 86400;
+    let year_days_full = Physic.secondsToDays(planet_period, planet_day_duration);
     let year_days = Math.floor(year_days_full);
     if (planetToEarthDays != 1) {
         let earth_days = Math.floor(year_days_full * planetToEarthDays);
@@ -55,14 +61,14 @@ function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<n
     if (moon_periods.length > 0) {
         // TODO: For now, there is only one moon. In the future we may support multiple moons.
         // calendar_description.push(`There are ${moon_periods.length} moons. Using principal moon.`); 
-        let moon_day_period = Physic.secondsToDays(moon_periods[0], planetDayDuration);
+        let moon_day_period = Physic.secondsToDays(moon_periods[0], planet_day_duration);
         if (planetToEarthDays != 1) {
             let moon_earth_days = Math.floor(moon_day_period * planetToEarthDays);
             calendar_description.push(`Principal Moon Period is ${moon_day_period} (almost ${moon_earth_days} Earth Days)`);
         } else {
             calendar_description.push(`Principal Moon Period is ${moon_day_period}`);
         }
-        let month_days = Math.floor(Physic.secondsToDays(moon_periods[0], planetDayDuration));
+        let month_days = Math.floor(Physic.secondsToDays(moon_periods[0], planet_day_duration));
         let lunar_months = Math.floor(year_days / month_days);
         let days_remainder = year_days - lunar_months * month_days;
         calendar_description.push(`Based on the principal satellite, we can subdivide the year into ${lunar_months} lunar months.`);
@@ -81,10 +87,10 @@ function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<n
 
 function instantiateCalendar(calendar_parameter: CalendarParameters, days_per_week: number) {
     const year_days = calendar_parameter.days_per_year;
-    const months = calendar_parameter.months_per_year; 
+    const months = calendar_parameter.months_per_year;
     const month_base_days = calendar_parameter.base_days_per_month;
 
-    let day_names = ["A","B","C","D","E","F","G"]
+    let day_names = ["A", "B", "C", "D", "E", "F", "G"]
 
     // For now names of days, months and other are just described with D1, M2, and so on...
     let days_remainder = year_days - months * month_base_days;
@@ -93,7 +99,7 @@ function instantiateCalendar(calendar_parameter: CalendarParameters, days_per_we
         days_per_month.push(month_base_days);
     }
     for (let i = 0; i < days_remainder; i++) {
-        days_per_month[Math.floor(Math.random()*months)] += 1;
+        days_per_month[Math.floor(Math.random() * months)] += 1;
     }
     console.log("[DEBUG] Days per Month: ")
     console.log(days_per_month);
@@ -101,8 +107,8 @@ function instantiateCalendar(calendar_parameter: CalendarParameters, days_per_we
     let week_d = 0
     for (let m = 0; m < months; m++) {
         let month_string = "";
-        for (let d = 0; d< days_per_month[m]; d++) {
-            month_string += `${day_names[(week_d % days_per_week)]} ${d+1} `;
+        for (let d = 0; d < days_per_month[m]; d++) {
+            month_string += `${day_names[(week_d % days_per_week)]} ${d + 1} `;
             week_d++;
         }
         let month_p = $("#calendar-example").append(`<p>M${m}: ${month_string}</p>`);
