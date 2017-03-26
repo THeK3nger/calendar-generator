@@ -1,4 +1,4 @@
-import * as $ from "jquery"
+import $ = require('jquery');
 
 import * as Physic from "physic"
 import * as CalendGen from "calendgen"

@@ -53,7 +53,7 @@ function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<n
     let output_parameters: CalendarParameters;
 
     if (moon_periods.length > 0) {
-        // TODO: For now, there are always one moon.
+        // TODO: For now, there is only one moon. In the future we may support multiple moons.
         // calendar_description.push(`There are ${moon_periods.length} moons. Using principal moon.`); 
         let moon_day_period = Physic.secondsToDays(moon_periods[0], planetDayDuration);
         if (planetToEarthDays != 1) {
@@ -74,7 +74,7 @@ function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<n
             months_per_year: lunar_months,
             base_days_per_month: month_days
         }
-        //instantiateCalendar(year_days, third_convergent[0], third_convergent[1], month_days, lunar_months, 7);
+        instantiateCalendar(output_parameters, 7);
     }
     return { description: calendar_description, calendar_parameters: output_parameters };
 }
@@ -83,6 +83,8 @@ function instantiateCalendar(calendar_parameter: CalendarParameters, days_per_we
     const year_days = calendar_parameter.days_per_year;
     const months = calendar_parameter.months_per_year; 
     const month_base_days = calendar_parameter.base_days_per_month;
+
+    let day_names = ["A","B","C","D","E","F","G"]
 
     // For now names of days, months and other are just described with D1, M2, and so on...
     let days_remainder = year_days - months * month_base_days;
@@ -100,14 +102,13 @@ function instantiateCalendar(calendar_parameter: CalendarParameters, days_per_we
     for (let m = 0; m < months; m++) {
         let month_string = "";
         for (let d = 0; d< days_per_month[m]; d++) {
-            month_string += `D${(week_d % days_per_week)+1} ${d+1} `;
+            month_string += `${day_names[(week_d % days_per_week)]} ${d+1} `;
             week_d++;
         }
         let month_p = $("#calendar-example").append(`<p>M${m}: ${month_string}</p>`);
     }
 
 }
-
 
 function continuedFractions(num: number, order: number): Array<number> {
     let result = [];
