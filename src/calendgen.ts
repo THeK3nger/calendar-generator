@@ -1,13 +1,28 @@
 import * as Physic from "physic"
+import * as Newton from "newton"
 
 interface MoonData {
     axis_major: number,
     mass: number
 }
 
-interface PlanetData { axis_major: number, mass: number, day_duration: number }
+interface PlanetData { 
+    axis_major: number, 
+    mass: number, 
+    day_duration: number }
 
 interface LeapYearData { leap_total_days: number, leap_period: number }
+
+/**
+ * Define the orbital parameters in a two-body problem.
+ */
+interface OrbitalParameters {
+    eccentricity: number, // Shape of the ellipse, describing how much it is elongated compared to a circle.
+    semimajor_axis: number, // The sum of the periapsis and apoapsis distances divided by two.
+    inclination: number, // Vertical tilt of the ellipse with respect to the reference plane.
+    ascending_node: number, // horizontally orients the ascending node of the ellipse with respect to the reference frame's vernal point.
+    argument_of_periapsis: number, // defines the orientation of the ellipse in the orbital plane
+}
 
 interface CalendarParameters {
     days_per_year: number,
@@ -180,4 +195,18 @@ function continuedFractions(num: number, order: number): Array<number> {
 
 function thirdOrderConvergent(cf: Array<number>): [number, number] {
     return [cf[3] * cf[2] * cf[1] + 1, cf[3] * (cf[2] * cf[1] + 1) + cf[1]];
+}
+
+// SEASONS
+
+interface SeasonsParameters {
+    equinox: number, /// Time in seconds for the first equinox.
+}
+
+export function computeSeasons(axial_tilt: number, A: number, B: number, eccentricity: number, period: number): SeasonsParameters {
+    let E = Newton.NewtonRoot(
+        (x) => (B*(Math.cos(x)-eccentricity) - A*(Math.sqrt(1-eccentricity*eccentricity)*Math.sin(x))),
+        (x) => -(B*Math.sin(x) + A*(Math.sqrt(1-eccentricity*eccentricity))*Math.cos(x)),
+        1, 0.01);
+    return {equinox: (period/(2*Math.PI))*(E - eccentricity*Math.sin(E))};
 }
