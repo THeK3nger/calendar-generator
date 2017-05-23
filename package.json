@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "start": "http-server ./build -p 8080"
+  },
   "dependencies": {
     "@types/jquery": "^2.0.41"
   }
