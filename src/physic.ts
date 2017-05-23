@@ -8,7 +8,7 @@ export const moon_mass = 7.348e22;
 export const earth_axmj = 149598023e3;
 export const moon_axmj = 384399e03;
 
-/** CONVERTION */
+/** CONVERTER FUNCTION */
 
 export function toAstronomicalUnit(meters: number): number {
     return meters / 149597870700;
