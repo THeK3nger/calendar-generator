@@ -1,8 +1,16 @@
 {
   "scripts": {
-    "start": "http-server ./build -p 8080"
+    "start": "http-server ./build -p 8080",
+    "test": "mocha -r ts-node/register --require amd-loader ./tests/**/*"
   },
   "dependencies": {
-    "@types/jquery": "^2.0.41"
+    "@types/chai": "^3.5.2",
+    "@types/jquery": "^2.0.41",
+    "@types/mocha": "^2.2.41",
+    "amd-loader": "^0.0.8",
+    "chai": "^3.5.0",
+    "mocha": "^3.4.1",
+    "ts-node": "^3.0.4",
+    "typescript": "^2.3.3"
   }
 }
