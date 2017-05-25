@@ -1,4 +1,5 @@
 import $ = require('jquery');
+import d3 = require('d3');
 
 import * as Physic from "physic"
 import * as CalendGen from "calendgen"
@@ -48,6 +49,31 @@ function init() {
     $("#dayduration").val(86400);
 }
 
+function drawOrbit() {
+    const scale = 22;
+    let root = d3.select("#visualization svg");
+
+    let e = 0.8167086;
+    let a = 200;
+    let b = a * Math.sqrt(1 - e*e);
+
+    let focus = 250 + a*e;
+
+    let star = root.append("circle")
+        .attr("cx", focus)
+        .attr("cy", 250)
+        .attr("r",20)
+        .style("fill","yellow");
+
+    let orbit = root.append("ellipse")
+        .attr("cx", 255)
+        .attr("cy", 250)
+        .attr("rx", a)
+        .attr("ry", b)
+        .style("fill", "none")
+        .style("stroke", "black");
+}
 // --------------- //
 
 init();
+drawOrbit();

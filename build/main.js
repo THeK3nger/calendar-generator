@@ -1,7 +1,8 @@
 requirejs.config({
-    "paths": {
-      "app": "app",
-      "jquery": "https://code.jquery.com/jquery-3.1.1.min"
+    paths: {
+      app: "app",
+      jquery: "https://code.jquery.com/jquery-3.1.1.min",
+      d3: "https://d3js.org/d3.v4.min"
     }
 });
 

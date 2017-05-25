@@ -5,6 +5,7 @@
   },
   "dependencies": {
     "@types/chai": "^3.5.2",
+    "@types/d3": "^4.9.0",
     "@types/jquery": "^2.0.41",
     "@types/mocha": "^2.2.41",
     "amd-loader": "^0.0.8",
