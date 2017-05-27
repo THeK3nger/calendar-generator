@@ -2,12 +2,14 @@ import * as Physic from "physic"
 import * as Newton from "newton"
 
 interface MoonData {
-    axis_major: number,
+    periapsis: number,
+    apoapsis: number,
     mass: number
 }
 
 interface PlanetData { 
-    axis_major: number, 
+    periapsis: number,
+    apoapsis: number,
     mass: number, 
     day_duration: number }
 
@@ -37,17 +39,18 @@ interface CalendarGeneratorOutput {
 };
 
 export function generateCalendarFromOrbit(planet_data: PlanetData, sun_mass: number, moons: Array<MoonData>): CalendarGeneratorOutput {
-    const planet_axis_major = planet_data.axis_major;
+    const planet_axis_major = (planet_data.periapsis + planet_data.apoapsis)/2;
     const planet_mass = planet_data.mass;
     const planet_day_duration = planet_data.day_duration;
 
     // Compute planet orbital period.
-    let planet_year = Physic.orbital_period(sun_mass, planet_axis_major, planet_mass, );
+    let planet_year = Physic.orbital_period(sun_mass, planet_axis_major, planet_mass );
 
     let moon_periods = [];
     // Compute moon periods.
     for (let moon of moons) {
-        moon_periods.push(Physic.orbital_period(planet_mass, moon.axis_major, moon.mass));
+        let moon_axis_major = (moon.periapsis+moon.apoapsis)/2
+        moon_periods.push(Physic.orbital_period(planet_mass, moon_axis_major, moon.mass));
     }
 
     return generateCalendarFromPeriod(planet_year, moon_periods, planet_day_duration);
