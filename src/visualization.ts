@@ -6,6 +6,9 @@ export class OrbitCanvas {
     scale = 22;
     width: number;
     height: number;
+    orbit;
+    star;
+    earth;
 
     constructor(width: number, height: number, container_id = 'body') {
         let container = d3.select(container_id);
@@ -19,14 +22,19 @@ export class OrbitCanvas {
         this.height = height;
     }
 
-    draw_orbit() {
-        let e = 0.1167086;
-        let a = 200;
+    draw_orbit(e: number) {
+        const margin = 30; // Specify the margin between orbit and canvas boundary.
+        let a = (this.width/2) - margin;
         let b = a * Math.sqrt(1 - e * e);
 
         let focus = a * e;
 
-        let orbit = this.canvas.append("ellipse")
+        if (!this.orbit) {
+            this.orbit = this.canvas.append("ellipse")
+        }
+        this.orbit
+            .transition()
+            .duration(750)
             .attr("cx", 0)
             .attr("cy", 0)
             .attr("rx", a)
@@ -35,13 +43,23 @@ export class OrbitCanvas {
             .style("stroke", "rgba(255, 204, 0, 0.25)")
             .style("stroke-width", 2);
 
-        let star = this.canvas.append("circle")
+        if (!this.star) {
+            this.star = this.canvas.append("circle")
+        }
+        this.star
+            .transition()
+            .duration(750)
             .attr("cx", focus)
             .attr("cy", 0)
             .attr("r", 20)
             .style("fill", "yellow");
 
-        let earth = this.canvas.append("circle")
+        if (!this.earth) {
+            this.earth = this.canvas.append("circle");
+        }
+        this.earth 
+            .transition()
+            .duration(750)
             .attr("cx", a)
             .attr("cy", 0)
             .attr("r", 10)

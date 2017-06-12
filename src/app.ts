@@ -22,6 +22,8 @@ function handleForm() {
         mass: planet_mass,
         day_duration: day_duration
     };
+    let e = (planet_aphelion - planet_perihelion) / (planet_aphelion + planet_perihelion);
+    viz.draw_orbit(e);
     let result = CalendGen.generateCalendarFromOrbit(planet_data, star_mass, [{ mass: moon_mass, periapsis: moon_perigee, apoapsis: moon_perigee }]);
     for (let s of result.description) {
         writeLine(s);
@@ -60,4 +62,7 @@ function init() {
 init();
 
 let viz = new Visualization.OrbitCanvas(500, 500, '#visualization');
-viz.draw_orbit();
+let planet_perihelion = parseFloat($("#planetperihelion").val());
+let planet_aphelion = parseFloat($("#planetaphelion").val());
+let e = (planet_aphelion - planet_perihelion) / (planet_aphelion + planet_perihelion);
+viz.draw_orbit(e);
