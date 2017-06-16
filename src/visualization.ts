@@ -9,6 +9,8 @@ export class OrbitCanvas {
     orbit;
     star;
     earth;
+    moon;
+    moon_orbit;
 
     constructor(width: number, height: number, container_id = 'body') {
         let container = d3.select(container_id);
@@ -23,7 +25,7 @@ export class OrbitCanvas {
     }
 
     draw_orbit(e: number) {
-        const margin = 30; // Specify the margin between orbit and canvas boundary.
+        const margin = 60; // Specify the margin between orbit and canvas boundary.
         let a = (this.width/2) - margin;
         let b = a * Math.sqrt(1 - e * e);
 
@@ -64,6 +66,30 @@ export class OrbitCanvas {
             .attr("cy", 0)
             .attr("r", 10)
             .style("fill", "rgba(113, 170, 255, 1.0)");
+
+        if (!this.moon_orbit) {
+            this.moon_orbit = this.canvas.append("circle");
+        }
+        this.moon_orbit
+            .transition()
+            .duration(750)
+            .attr("cx", a)
+            .attr("cy", 0)
+            .attr("r", 30)
+            .style("fill", "none")
+            .style("stroke", "rgba(255, 255, 255, 0.25)")
+            .style("stroke-width", 2);
+
+        if (!this.moon) {
+            this.moon = this.canvas.append("circle");
+        }
+        this.moon
+            .transition()
+            .duration(750)
+            .attr("cx", a + 30)
+            .attr("cy", 0)
+            .attr("r", 5)
+            .style("fill", "rgba(200,200,200,1.0)");
     }
 
 }
