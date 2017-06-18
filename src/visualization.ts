@@ -163,56 +163,52 @@ class SeasonDiagram {
 
     sun: CelestialBody;
     equinox_angle: number;
-    svg_element: { equinox_line, solstice_line }
     lines_size: number;
+    parent;
 
     constructor(parent, center: CelestialBody, equinox_angle: number) {
         this.sun = center;
         this.equinox_angle = equinox_angle;
-        this.svg_element = { equinox_line: undefined, solstice_line: undefined };
         this.lines_size = 500;
+        this.parent = parent;
 
-        let x1 = this.sun.cx + this.lines_size * Math.cos(this.equinox_angle);
-        let y1 = this.sun.cy - this.lines_size * Math.sin(this.equinox_angle);
-        let x2 = this.sun.cx - this.lines_size * Math.cos(this.equinox_angle);
-        let y2 = this.sun.cy + this.lines_size * Math.sin(this.equinox_angle);
-
-        this.svg_element.equinox_line = parent.append("line")
-            .attr("x1", x1)
-            .attr("y1", y1)
-            .attr("x2", x2)
-            .attr("y2", y2)
-            .style("stroke", "rgba(255, 0, 0, 0.85)")
-            .style("stroke-width", 2);
-
-        this.svg_element.solstice_line = parent.append("line")
-            .attr("x1", -y1)
-            .attr("y1", x1)
-            .attr("x2", -y2)
-            .attr("y2", x2)
-            .style("stroke", "rgba(255, 0, 0, 0.85)")
-            .style("stroke-width", 2);
+        this.update();
     }
 
     update() {
-        let x1 = this.sun.cx + this.lines_size * Math.cos(this.equinox_angle);
-        let y1 = this.sun.cy - this.lines_size * Math.sin(this.equinox_angle);
-        let x2 = this.sun.cx - this.lines_size * Math.cos(this.equinox_angle);
-        let y2 = this.sun.cy + this.lines_size * Math.sin(this.equinox_angle);
+        let _x1 = this.lines_size * Math.cos(this.equinox_angle);
+        let _y1 = this.lines_size * Math.sin(this.equinox_angle);
 
-        this.svg_element.equinox_line
-            .transition()
-            .duration(750)
-            .attr("x1", x1)
-            .attr("y1", y1)
-            .attr("x2", x2)
-            .attr("y2", y2);
-        this.svg_element.solstice_line
-            .transition()
-            .duration(750)
-            .attr("x1", -y1)
-            .attr("y1", x1)
-            .attr("x2", -y2)
-            .attr("y2", x2);
+        let data = [{
+            x1: this.sun.cx + _x1,
+            y1: this.sun.cy - _y1,
+            x2: this.sun.cx - _x1,
+            y2: this.sun.cy + _y1
+        },
+        {
+            x1: this.sun.cx - _y1,
+            y1: this.sun.cy - _x1,
+            x2: this.sun.cx + _y1,
+            y2: this.sun.cy + _x1
+        }];
+
+        let svg_element = this.parent.selectAll("#season-line").data(data);
+
+        svg_element.transition().duration(750)
+            .attr("x1", (d) => d.x1)
+            .attr("y1", (d) => d.y1)
+            .attr("x2", (d) => d.x2)
+            .attr("y2", (d) => d.y2);
+
+        svg_element.enter().append("line")
+            .attr("id", "season-line")
+            .attr("x1", (d) => d.x1)
+            .attr("y1", (d) => d.y1)
+            .attr("x2", (d) => d.x2)
+            .attr("y2", (d) => d.y2)
+            .style("stroke", "rgba(255, 0, 0, 0.85)")
+            .style("stroke-width", 2);
+
+        svg_element.exit().remove();
     }
 }
