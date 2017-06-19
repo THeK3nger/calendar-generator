@@ -44,6 +44,7 @@ export class OrbitCanvas {
         if (!this.seasons) {
             this.seasons = new SeasonDiagram(this.season_canvas, this.star, equinox_angle);
         } else {
+            this.seasons.equinox_angle = equinox_angle;
             this.seasons.update();
         }
     }
@@ -192,6 +193,46 @@ class SeasonDiagram {
             y2: this.sun.cy + _x1
         }];
 
+        let bars_data = [
+            { startAngle: Math.PI / 2 - this.equinox_angle, endAngle: -this.equinox_angle, id: "spring-bar", color: "#33DD33", name: "Spring" },
+            { startAngle: -this.equinox_angle, endAngle: -this.equinox_angle - Math.PI / 2, id: "summer-bar", color: "#DDDD33", name: "Summer" },
+            { startAngle: -this.equinox_angle - Math.PI / 2, endAngle: -this.equinox_angle - Math.PI, id: "autumn-bar", color: "#DD5533", name: "Autumn" },
+            { startAngle: -this.equinox_angle - Math.PI, endAngle: -this.equinox_angle - (3 / 2) * Math.PI, id: "winter-bar", color: "#3333DD", name: "Winter" }
+        ];
+
+        var arc = d3.arc()
+            .innerRadius(100)
+            .outerRadius(110);
+
+        let season_bars = this.parent.selectAll(".descriptor").data(bars_data);
+
+        season_bars.enter().append("path")
+            .attr("class", "descriptor")
+            .attr("id", (d) => d.id)
+            .attr("d", arc)
+            .attr("transform", `translate(${this.sun.cx},${this.sun.cy})`)
+            .style("fill", (d) => d.color);
+
+        season_bars.exit().remove();
+
+        season_bars.transition().duration(750)
+            .attr("transform", `translate(${this.sun.cx},${this.sun.cy})`)
+            .attr("d", arc);
+
+        let season_names = this.parent.selectAll(".season-name").data(bars_data);
+
+        season_names.enter().append("text")
+            .attr("x", 100)   // TODO: Make this dynamic.
+            .attr("dy", 18)
+            .attr("class", "season-name")
+            .append("textPath") //append a textPath to the text element
+            .attr("xlink:href", (d) => `#${d.id}`) //place the ID of the path here
+            .style("text-anchor", "middle") //place the text halfway on the arc
+            .attr("startOffset", "50%")
+            .text((d) => d.name);
+
+        season_names.exit().remove();
+
         let svg_element = this.parent.selectAll("#season-line").data(data);
 
         svg_element.transition().duration(750)
@@ -206,7 +247,7 @@ class SeasonDiagram {
             .attr("y1", (d) => d.y1)
             .attr("x2", (d) => d.x2)
             .attr("y2", (d) => d.y2)
-            .style("stroke", "rgba(255, 0, 0, 0.85)")
+            .style("stroke", "rgba(255, 100, 80, 0.65)")
             .style("stroke-width", 2);
 
         svg_element.exit().remove();
