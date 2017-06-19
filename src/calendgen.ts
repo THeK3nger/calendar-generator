@@ -7,11 +7,12 @@ interface MoonData {
     mass: number
 }
 
-interface PlanetData { 
+interface PlanetData {
     periapsis: number,
     apoapsis: number,
-    mass: number, 
-    day_duration: number }
+    mass: number,
+    day_duration: number
+}
 
 interface LeapYearData { leap_total_days: number, leap_period: number }
 
@@ -39,21 +40,25 @@ interface CalendarGeneratorOutput {
 };
 
 export function generateCalendarFromOrbit(planet_data: PlanetData, sun_mass: number, moons: Array<MoonData>): CalendarGeneratorOutput {
-    const planet_axis_major = (planet_data.periapsis + planet_data.apoapsis)/2;
+    const planet_axis_major = (planet_data.periapsis + planet_data.apoapsis) / 2;
     const planet_mass = planet_data.mass;
     const planet_day_duration = planet_data.day_duration;
+    const eccentricity = (planet_data.apoapsis - planet_data.periapsis) / (planet_data.apoapsis + planet_data.periapsis);
 
     // Compute planet orbital period.
-    let planet_year = Physic.orbital_period(sun_mass, planet_axis_major, planet_mass );
+    let planet_year = Physic.orbital_period(sun_mass, planet_axis_major, planet_mass);
 
     let moon_periods = [];
     // Compute moon periods.
     for (let moon of moons) {
-        let moon_axis_major = (moon.periapsis+moon.apoapsis)/2
+        let moon_axis_major = (moon.periapsis + moon.apoapsis) / 2
         moon_periods.push(Physic.orbital_period(planet_mass, moon_axis_major, moon.mass));
     }
 
-    return generateCalendarFromPeriod(planet_year, moon_periods, planet_day_duration);
+    const seasons = computeSeasons(0, 6, 4, eccentricity, planet_year);
+    const calendar = generateCalendarFromPeriod(planet_year, moon_periods, planet_day_duration);
+    instantiateCalendar(calendar, 7, seasons);
+    return calendar;
 }
 
 function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<number>, planet_day_duration: number = 86400): CalendarGeneratorOutput {
@@ -98,7 +103,6 @@ function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<n
             months_per_year: lunar_months,
             base_days_per_month: month_days
         }
-        instantiateCalendar(output_parameters, 7);
     }
     return { description: calendar_description, calendar_parameters: output_parameters };
 }
@@ -111,45 +115,50 @@ function generateMonthTableHeader(month_table: JQuery, days_per_week: number, da
     month_table.append(`<tr>${month_table_header}</tr>`);
 }
 
-function generateMonthTableContents(month_table: JQuery, starting_week_day: number, days_per_week, days_per_month: number[], current_month: number): number {
-        let week_d = starting_week_day;
-        let m = current_month;
-        let table_day_index = -(week_d % days_per_week); // This is used for aligning the first day to the current week day.
-        let row_day_split = 0;
-        let month_week_line = ""
-        // Fill the empty cells at the begining of the month.
-        // This depends on the starting week day for the current month.
-        while (table_day_index < 0) {
-            month_week_line += "<td></td>";
-            row_day_split++;
-            table_day_index++;
-        }
-        // Now fill the actual table.
-        for (let dm = 0; dm < days_per_month[m]; dm++) {
+function generateMonthTableContents(month_table: JQuery, starting_week_day: number, days_per_week, days_per_month: number[], current_month: number, season_days = undefined): number {
+    let week_d = starting_week_day;
+    let m = current_month;
+    let table_day_index = -(week_d % days_per_week); // This is used for aligning the first day to the current week day.
+    let row_day_split = 0;
+    let month_week_line = ""
+    // Fill the empty cells at the begining of the month.
+    // This depends on the starting week day for the current month.
+    while (table_day_index < 0) {
+        month_week_line += "<td></td>";
+        row_day_split++;
+        table_day_index++;
+    }
+    // Now fill the actual table.
+    for (let dm = 0; dm < days_per_month[m]; dm++) {
+        if (season_days === dm) {
+            month_week_line += `<td style="color: red">${dm + 1}</td>`;
+        } else {
             month_week_line += `<td>${dm + 1}</td>`;
-            table_day_index++;
-            week_d++;
-            row_day_split++;
-            if (row_day_split >= days_per_week) {
-                row_day_split = row_day_split - days_per_week;
-                month_table.append(`<tr>${month_week_line}</tr>`);
-                month_week_line = "";
-            }
         }
-        // Fill the remaining cells in the last row (if any).
-        while (row_day_split != 0 && row_day_split < days_per_week) {
-            month_week_line += "<td></td>";
-            row_day_split++;
-            table_day_index++;
-        }
-        if (month_week_line != "") {
+        table_day_index++;
+        week_d++;
+        row_day_split++;
+        if (row_day_split >= days_per_week) {
+            row_day_split = row_day_split - days_per_week;
             month_table.append(`<tr>${month_week_line}</tr>`);
+            month_week_line = "";
         }
-        return week_d % days_per_week;
+    }
+    // Fill the remaining cells in the last row (if any).
+    while (row_day_split != 0 && row_day_split < days_per_week) {
+        month_week_line += "<td></td>";
+        row_day_split++;
+        table_day_index++;
+    }
+    if (month_week_line != "") {
+        month_table.append(`<tr>${month_week_line}</tr>`);
+    }
+    return week_d % days_per_week;
 }
 
-function instantiateCalendar(calendar_parameter: CalendarParameters, days_per_week: number) {
-    $("#calendar-example div").remove(); 
+function instantiateCalendar(calendar: CalendarGeneratorOutput, days_per_week: number, seasons: SeasonsParameters) {
+    $("#calendar-example div").remove();
+    const calendar_parameter = calendar.calendar_parameters;
 
     const year_days = calendar_parameter.days_per_year;
     const months = calendar_parameter.months_per_year;
@@ -168,6 +177,54 @@ function instantiateCalendar(calendar_parameter: CalendarParameters, days_per_we
     }
     console.log("[DEBUG] Days per Month: ")
     console.log(days_per_month);
+    console.log(seasons);
+
+    let spring_equinox = Math.floor(seasons.spring_equinox / 86400); // TODO: Get this from the parameter.
+    let spring_month = 0;
+    for (let i = 0; i < months; i++) {
+        if (spring_equinox < days_per_month[i]) {
+            break;
+        }
+        spring_equinox -= days_per_month[i];
+        spring_month = i;
+    }
+
+    let summer_solstice = Math.floor(seasons.summer_solstice / 86400); // TODO: Get this from the parameter.
+    let summer_month = 0;
+    for (let i = 0; i < months; i++) {
+        if (summer_solstice < days_per_month[i]) {
+            break;
+        }
+        summer_solstice -= days_per_month[i];
+        summer_month = i;
+    }
+
+    let autumn_equinox = Math.floor(seasons.autumn_equinox / 86400); // TODO: Get this from the parameter.
+    let autumn_month = 0;
+    for (let i = 0; i < months; i++) {
+        if (autumn_equinox < days_per_month[i]) {
+            break;
+        }
+        autumn_equinox -= days_per_month[i];
+        autumn_month = i;
+    }
+
+    let winter_solstice = Math.floor(seasons.winter_solstice / 86400); // TODO: Get this from the parameter.
+    let winter_month = 0;
+    for (let i = 0; i < months; i++) {
+        if (winter_solstice < days_per_month[i]) {
+            break;
+        }
+        winter_solstice -= days_per_month[i];
+        winter_month = i;
+    }
+
+    calendar.description.push(`Spring Equinox occurs in the ${spring_month + 1}th month on the ${spring_equinox + 1}th day.`);
+    calendar.description.push(`Summer Solstice occurs in the ${summer_month + 1}th month on the ${summer_solstice + 1}th day.`);
+    calendar.description.push(`Spring Equinox occurs in the ${autumn_month + 1}th month on the ${autumn_equinox + 1}th day.`);
+    calendar.description.push(`Spring Equinox occurs in the ${winter_month + 1}th month on the ${winter_solstice + 1}th day.`);
+
+    console.log(`SpringEquinox = ${spring_month} ${spring_equinox + 1}th`);
 
     let week_d = 0
     for (let m = 0; m < months; m++) {
@@ -176,7 +233,10 @@ function instantiateCalendar(calendar_parameter: CalendarParameters, days_per_we
         let month_table = $(`<table border="1"></table>`);
         generateMonthTableHeader(month_table, days_per_week, day_names);
 
-        week_d = generateMonthTableContents(month_table, week_d, days_per_week, days_per_month, m)
+        if (m === spring_month)
+            week_d = generateMonthTableContents(month_table, week_d, days_per_week, days_per_month, m, spring_equinox);
+        else
+            week_d = generateMonthTableContents(month_table, week_d, days_per_week, days_per_month, m);
 
         month_table.appendTo(month_div);
         month_div.appendTo("#calendar-example");
@@ -203,13 +263,25 @@ function thirdOrderConvergent(cf: Array<number>): [number, number] {
 // SEASONS
 
 interface SeasonsParameters {
-    equinox: number, /// Time in seconds for the first equinox.
+    spring_equinox: number, /// Time in seconds for the first equinox.
+    summer_solstice: number,
+    autumn_equinox: number,
+    winter_solstice: number
 }
 
 export function computeSeasons(axial_tilt: number, A: number, B: number, eccentricity: number, period: number): SeasonsParameters {
     let E = Newton.NewtonRoot(
-        (x) => (B*(Math.cos(x)-eccentricity) - A*(Math.sqrt(1-eccentricity*eccentricity)*Math.sin(x))),
-        (x) => -(B*Math.sin(x) + A*(Math.sqrt(1-eccentricity*eccentricity))*Math.cos(x)),
+        (x) => (B * (Math.cos(x) - eccentricity) - A * (Math.sqrt(1 - eccentricity * eccentricity) * Math.sin(x))),
+        (x) => -(B * Math.sin(x) + A * (Math.sqrt(1 - eccentricity * eccentricity)) * Math.cos(x)),
         1, 0.01);
-    return {equinox: (period/(2*Math.PI))*(E - eccentricity*Math.sin(E))};
+    let E2 = E + Math.PI / 2;
+    let E3 = E + Math.PI;
+    let E4 = E + (3 / 2) * Math.PI;
+    return {
+        spring_equinox: (period / (2 * Math.PI)) * (E - eccentricity * Math.sin(E)),
+        summer_solstice: (period / (2 * Math.PI)) * (E2 - eccentricity * Math.sin(E2)),
+        autumn_equinox: (period / (2 * Math.PI)) * (E3 - eccentricity * Math.sin(E3)),
+        winter_solstice: (period / (2 * Math.PI)) * (E4 - eccentricity * Math.sin(E4))
+    };
+
 }
