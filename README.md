@@ -29,7 +29,7 @@ I will address the problem with such exotic planets in the future.
 ## Feature Backlog
 
 - [ ] Lunar Phases
-- [ ] Seasons
+- [x] Seasons
 - [ ] Astrological Features (zodiac-like)
 - [ ] Multi-Year Cycles (e.g., like in the Chinese Calendar)
 - [ ] Possibility to have months different from the "lunar month".

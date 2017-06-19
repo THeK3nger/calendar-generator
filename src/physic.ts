@@ -5,8 +5,10 @@ export const earth_mass = 5.972e24;
 export const moon_mass = 7.348e22;
 
 /** AXIS MAJOR CONSTANTS */
-export const earth_axmj = 149598023e3;
-export const moon_axmj = 384399e03;
+export const earth_perihelion = 147095e6;
+export const earth_aphelion = 152100e6;
+export const moon_perigee = 362600e3;
+export const moon_apogee = 	405400e3;
 
 /** CONVERTER FUNCTION */
 

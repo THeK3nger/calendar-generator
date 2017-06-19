@@ -12,14 +12,13 @@
   <script data-main="main" src="require.js"></script>
 
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/orbit.css">
   <link rel="shortcut icon" href="favicon.ico" />
 </head>
 
 <body>
   <h1>Calendar Generator</h1>
-  <div id="visualization">
-    <svg width="500" height="500" style="background:#222"></svg>
-  </div>
+  <div id="visualization"></div>
   <div id="generator">
     <div id="input">
       <form id="formInputs">
@@ -32,8 +31,12 @@
           <input type="text" id="planetmass">
         </p>
         <p>
-          Planet Major-Semi-Axis (Km):
-          <input type="text" id="planetaxismajor">
+          Planet Perihelion  (Km):
+          <input type="text" id="planetperihelion">
+        </p>
+        <p>
+          Planet Aphelion (Km):
+          <input type="text" id="planetaphelion">
         </p>
         <p>
           Planet's Day Duration in Seconds:
@@ -44,8 +47,12 @@
           <input type="text" id="moonmass">
         </p>
         <p>
-          Moon Major-Semi-Axis (Km):
-          <input type="text" id="moonaxismajor">
+          Moon Perigee (Km):
+          <input type="text" id="moonperigee">
+        </p>
+        <p>
+          Moon Apogee (Km):
+          <input type="text" id="moonapogee">
         </p>
         <p><button id="generateButton" type="button">Generate</button></p>
       </form>
