@@ -4,7 +4,7 @@
         "target": "es5",
         "noImplicitAny": false,
         "sourceMap": false,
-        "outFile": "build/app.js"
+        "outFile": "dist/app.js"
     },
     "files": [
         "src/app.ts"
