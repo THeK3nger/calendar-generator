@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.2.5] - 2017-08-12
+
+### Changed
+
+ - I am refactoring the code for more complex functionality. The first step in this direction is to move to a more robust build system. This internal release is just for this: from plain `tsc` to Webpack. 
+
 ## [0.2.0] - 2017-06-19
 ### Added
 - **New! Orbit Scheme!** Now there is a simple schematic view of the orbit. This include the orbit shape, the moon and a diagram of the seasons on the planet. More features for the visualizer in the future!
