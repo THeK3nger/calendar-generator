@@ -2,7 +2,7 @@
   "scripts": {
     "start": "http-server ./dist -p 8080",
     "test": "mocha -r ts-node/register --require amd-loader ./tests/**/*",
-    "build": "node_modules/webpack/bin/webpack.js"
+    "build": "node ./node_modules/webpack/bin/webpack.js"
   },
   "dependencies": {
     "@types/chai": "^3.5.2",
