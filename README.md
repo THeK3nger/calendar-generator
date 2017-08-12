@@ -14,11 +14,13 @@ Then clone this repository
 
     git clone https://github.com/THeK3nger/calendar-generator.git
 
-Then, build it!
+Then, build it! Build system is based on [Webpack.js][2].
 
-    npm install && tsc
+    npm install && npm run build
 
-You will find everything in the `build` folder, ready to be deployed.
+You will find everything in the `dist` folder, ready to be deployed. You can also start a local web-server with:
+
+    npm start
 
 ## Known Issues
 
@@ -43,3 +45,4 @@ I am open for external contributions, of course! Fork this repo an open a pull r
 
 
 [1]: http://www.davideaversa.it/experiment/calendgen/
+[2]: https://webpack.js.org/
