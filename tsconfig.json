@@ -1,12 +1,16 @@
 {
     "compilerOptions": {
-        "module": "amd",
+        "module": "commonjs",
         "target": "es5",
         "noImplicitAny": false,
-        "sourceMap": false,
-        "outFile": "dist/app.js"
+        "sourceMap": true,
+        "outDir": "./dist/"
     },
     "files": [
-        "src/app.ts"
+        "src/app.ts",
+        "src/calendgen.ts",
+        "src/newton.ts",
+        "src/physic.ts",
+        "src/visualization.ts"
     ]
 }

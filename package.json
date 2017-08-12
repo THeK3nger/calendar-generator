@@ -1,7 +1,8 @@
 {
   "scripts": {
-    "start": "http-server ./build -p 8080",
-    "test": "mocha -r ts-node/register --require amd-loader ./tests/**/*"
+    "start": "http-server ./dist -p 8080",
+    "test": "mocha -r ts-node/register --require amd-loader ./tests/**/*",
+    "build": "node_modules/webpack/bin/webpack.js"
   },
   "dependencies": {
     "@types/chai": "^3.5.2",
@@ -16,6 +17,7 @@
     "vue": "^2.4.2"
   },
   "devDependencies": {
+    "ts-loader": "^2.3.2",
     "webpack": "^3.5.1"
   }
 }

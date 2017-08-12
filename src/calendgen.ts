@@ -1,5 +1,5 @@
-import * as Physic from "physic"
-import * as Newton from "newton"
+import * as Physic from "./physic"
+import * as Newton from "./newton"
 
 interface MoonData {
     periapsis: number,

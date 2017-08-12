@@ -1,11 +1,11 @@
-import $ = require('jquery');
-import d3 = require('d3');
+import * as $ from 'jquery';
+import * as d3 from 'd3';
 
-import * as Physic from "physic"
-import * as CalendGen from "calendgen"
-import * as Visualization from "visualization"
+import * as Physic from "./physic"
+import * as CalendGen from "./calendgen"
+import * as Visualization from "./visualization"
 
-function handleForm() {
+function handleForm(viz) {
     console.log("Click Received. Starting Calendar Generation.");
     let star_mass = parseFloat($("#starmass").val());
     let planet_mass = parseFloat($("#planetmass").val());
@@ -24,7 +24,7 @@ function handleForm() {
     };
     let e = (planet_aphelion - planet_perihelion) / (planet_aphelion + planet_perihelion);
     viz.draw_orbit(e);
-    viz.draw_seasons(e, Math.atan2(6,4));
+    viz.draw_seasons(e, Math.atan2(6, 4));
     let result = CalendGen.generateCalendarFromOrbit(planet_data, star_mass, [{ mass: moon_mass, periapsis: moon_perigee, apoapsis: moon_perigee }]);
     for (let s of result.description) {
         writeLine(s);
@@ -45,9 +45,11 @@ function clear() {
     $("#calendar-description p").remove();
 }
 
-function init() {
+export function init() {
     console.log("I ADD CLICK");
-    $("#generateButton").click(handleForm);
+    let viz = new Visualization.OrbitCanvas(500, 500, '#visualization');
+    
+    $("#generateButton").click(() => handleForm(viz));
     $("#starmass").val(Physic.sun_mass);
     $("#planetmass").val(Physic.earth_mass);
     $("#planetperihelion").val(Physic.earth_perihelion / 1000);
@@ -56,17 +58,12 @@ function init() {
     $("#moonperigee").val(Physic.moon_perigee / 1000);
     $("#moonapogee").val(Physic.moon_apogee / 1000);
     $("#dayduration").val(86400);
+
+    let planet_perihelion = parseFloat($("#planetperihelion").val());
+    let planet_aphelion = parseFloat($("#planetaphelion").val());
+    let e = (planet_aphelion - planet_perihelion) / (planet_aphelion + planet_perihelion);
+    let equinox_angle = Math.atan2(6, 4);
+
+    viz.draw_orbit(e);
+    viz.draw_seasons(e, equinox_angle);
 }
-
-// --------------- //
-
-init();
-
-let viz = new Visualization.OrbitCanvas(500, 500, '#visualization');
-let planet_perihelion = parseFloat($("#planetperihelion").val());
-let planet_aphelion = parseFloat($("#planetaphelion").val());
-let e = (planet_aphelion - planet_perihelion) / (planet_aphelion + planet_perihelion);
-let equinox_angle = Math.atan2(6,4);
-
-viz.draw_orbit(e);
-viz.draw_seasons(e, equinox_angle);
