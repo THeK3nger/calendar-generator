@@ -5,6 +5,8 @@ import * as Physic from "./physic"
 import * as CalendGen from "./calendgen"
 import * as Visualization from "./visualization"
 
+import * as Example from "./render"
+
 function handleForm(viz) {
     console.log("Click Received. Starting Calendar Generation.");
     let star_mass = parseFloat($("#starmass").val());
@@ -66,4 +68,6 @@ export function init() {
 
     viz.draw_orbit(e);
     viz.draw_seasons(e, equinox_angle);
+
+    Example.renderExample();
 }
