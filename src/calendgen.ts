@@ -48,7 +48,7 @@ export function generateCalendarFromOrbit(planet_data: PlanetData, sun_mass: num
     // Compute planet orbital period.
     let planet_year = Physic.orbital_period(sun_mass, planet_axis_major, planet_mass);
 
-    let moon_periods = [];
+    let moon_periods: Array<number> = [];
     // Compute moon periods.
     for (let moon of moons) {
         let moon_axis_major = (moon.periapsis + moon.apoapsis) / 2
@@ -62,7 +62,7 @@ export function generateCalendarFromOrbit(planet_data: PlanetData, sun_mass: num
 }
 
 function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<number>, planet_day_duration: number = 86400): CalendarGeneratorOutput {
-    let calendar_description = [];
+    let calendar_description: Array<string> = [];
 
     let planetToEarthDays = planet_day_duration / 86400;
     let year_days_full = Physic.secondsToDays(planet_period, planet_day_duration);
@@ -79,7 +79,12 @@ function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<n
     let third_convergent = thirdOrderConvergent(planet_cf);
     calendar_description.push(`Calendar has approximately ${third_convergent[0]} leap days every ${third_convergent[1]} years.`);
 
-    let output_parameters: CalendarParameters;
+    let output_parameters: CalendarParameters = {
+        days_per_year: 365,
+        leap: { leap_total_days: 2, leap_period: 3 },
+        months_per_year: 12,
+        base_days_per_month: 30
+    }
 
     if (moon_periods.length > 0) {
         // TODO: For now, there is only one moon. In the future we may support multiple moons.
@@ -115,7 +120,7 @@ function generateMonthTableHeader(month_table: JQuery, days_per_week: number, da
     month_table.append(`<tr>${month_table_header}</tr>`);
 }
 
-function generateMonthTableContents(month_table: JQuery, starting_week_day: number, days_per_week, days_per_month: number[], current_month: number, season_days = undefined): number {
+function generateMonthTableContents(month_table: JQuery, starting_week_day: number, days_per_week, days_per_month: Array<number>, current_month: number, season_days: undefined | number = undefined): number {
     let week_d = starting_week_day;
     let m = current_month;
     let table_day_index = -(week_d % days_per_week); // This is used for aligning the first day to the current week day.
@@ -168,7 +173,7 @@ function instantiateCalendar(calendar: CalendarGeneratorOutput, days_per_week: n
 
     // Allocate all the spare days into random months.
     let days_remainder = year_days - months * month_base_days;
-    let days_per_month = [];
+    let days_per_month: Array<number> = [];
     for (let i = 0; i < months; i++) {
         days_per_month.push(month_base_days);
     }
@@ -244,7 +249,7 @@ function instantiateCalendar(calendar: CalendarGeneratorOutput, days_per_week: n
 }
 
 function continuedFractions(num: number, order: number): Array<number> {
-    let result = [];
+    let result: Array<number> = [];
     let remainer = num;
     let f = 0;
     for (let i = 0; i <= order; i++) {
