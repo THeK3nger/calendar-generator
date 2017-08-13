@@ -1,7 +1,6 @@
 import * as $ from 'jquery';
 import * as d3 from 'd3';
 
-import * as Physic from "./physic"
 import * as CalendGen from "./calendgen"
 import * as Visualization from "./visualization"
 
@@ -52,16 +51,6 @@ export function init() {
     GeneratorUI.initializeComponents();
 
     let viz = new Visualization.OrbitCanvas(500, 500, '#visualization');
-    
-    // $("#generateButton").click(() => handleForm(viz));
-    // $("#starmass").val(Physic.sun_mass);
-    // $("#planetmass").val(Physic.earth_mass);
-    // $("#planetperihelion").val(Physic.earth_perihelion / 1000);
-    // $("#planetaphelion").val(Physic.earth_aphelion / 1000);
-    // $("#moonmass").val(Physic.moon_mass);
-    // $("#moonperigee").val(Physic.moon_perigee / 1000);
-    // $("#moonapogee").val(Physic.moon_apogee / 1000);
-    // $("#dayduration").val(86400);
 
     let planet_perihelion = parseFloat($("#planetperihelion").val());
     let planet_aphelion = parseFloat($("#planetaphelion").val());

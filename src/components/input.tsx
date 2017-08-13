@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { NumericTextInputProps, NumericTextInputState, NumericTextInput } from "./numeric_text_input";
+
 export interface GeneratorInputProps {
     star_mass: number,
     planet_mass: number,
@@ -11,8 +13,6 @@ export interface GeneratorInputProps {
     moon_apogee: number
 }
 
-// 'HelloProps' describes the shape of props.
-// State is never set so we use the 'undefined' type.
 export class GeneratorInput extends React.Component<GeneratorInputProps, {}> {
 
     initial_values: GeneratorInputProps;
@@ -26,38 +26,14 @@ export class GeneratorInput extends React.Component<GeneratorInputProps, {}> {
         return (
             <div id="input">
                 <form id="formInputs">
-                    <p>
-                        Star Mass (Kg):
-                <input type="text" id="starmass" defaultValue={this.props.star_mass.toString()} />
-                    </p>
-                    <p>
-                        Planet Mass (Kg):
-                <input type="text" id="planetmass" defaultValue={this.props.planet_mass.toString()}/>
-                    </p>
-                    <p>
-                        Planet Perihelion (Km):
-                <input type="text" id="planetperihelion"  defaultValue={this.props.planet_perihelion.toString()} />
-                    </p>
-                    <p>
-                        Planet Aphelion (Km):
-                <input type="text" id="planetaphelion"  defaultValue={this.props.planet_perihelion.toString()} />
-                    </p>
-                    <p>
-                        Planet's Day Duration in Seconds:
-                <input type="number" id="dayduration" defaultValue={this.props.day_duration.toString()} />
-                    </p>
-                    <p>
-                        Moon Mass (Kg):
-                <input type="text" id="moonmass" defaultValue={this.props.moon_mass.toString()} />
-                    </p>
-                    <p>
-                        Moon Perigee (Km):
-                <input type="text" id="moonperigee" defaultValue={this.props.moon_perigee.toString()} />
-                    </p>
-                    <p>
-                        Moon Apogee (Km):
-                <input type="text" id="moonapogee" defaultValue={this.props.moon_apogee.toString()} />
-                    </p>
+                    <NumericTextInput id="starmass" label="Star Mass (Kg)" defaultValue={this.props.star_mass} />
+                    <NumericTextInput id="planetmass" label="Planet Mass (Kg)" defaultValue={this.props.planet_mass} />
+                    <NumericTextInput id="planetperihelion" label="Planet Perihelion (Km)" defaultValue={this.props.planet_perihelion} />
+                    <NumericTextInput id="planetaphelion" label="Planet Aphelion (Km)" defaultValue={this.props.planet_aphelion} />
+                    <NumericTextInput id="dayduration" label="Planet's Day Duration in Seconds" defaultValue={this.props.day_duration} />
+                    <NumericTextInput id="moonmass" label="Moon Mass (Kg)" defaultValue={this.props.moon_mass} />
+                    <NumericTextInput id="moonperigee" label="Moon Perigee (Km)" defaultValue={this.props.moon_perigee} />
+                    <NumericTextInput id="moonapogee" label="Moon Apogee (Kg)" defaultValue={this.props.moon_apogee} />
                     <p><button id="generateButton" type="button">Generate</button></p>
                 </form>
             </div>
