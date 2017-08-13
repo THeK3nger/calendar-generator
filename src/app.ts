@@ -5,7 +5,7 @@ import * as Physic from "./physic"
 import * as CalendGen from "./calendgen"
 import * as Visualization from "./visualization"
 
-import * as Example from "./render"
+import * as GeneratorUI from "./interface"
 
 function handleForm(viz) {
     console.log("Click Received. Starting Calendar Generation.");
@@ -49,6 +49,8 @@ function clear() {
 
 export function init() {
     console.log("I ADD CLICK");
+    GeneratorUI.initializeComponents();
+
     let viz = new Visualization.OrbitCanvas(500, 500, '#visualization');
     
     $("#generateButton").click(() => handleForm(viz));
@@ -69,5 +71,5 @@ export function init() {
     viz.draw_orbit(e);
     viz.draw_seasons(e, equinox_angle);
 
-    Example.renderExample();
+
 }
