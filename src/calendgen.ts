@@ -57,7 +57,7 @@ export function generateCalendarFromOrbit(planet_data: PlanetData, sun_mass: num
 
     const seasons = computeSeasons(0, 6, 4, eccentricity, planet_year);
     const calendar = generateCalendarFromPeriod(planet_year, moon_periods, planet_day_duration);
-    instantiateCalendar(calendar, 7, seasons);
+    //instantiateCalendar(calendar, 7, seasons);
     return calendar;
 }
 
