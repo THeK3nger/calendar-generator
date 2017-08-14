@@ -17,7 +17,8 @@ import * as CalendGen from "./calendgen"
 interface CalendarGeneratorState {
     viz: Visualization.OrbitCanvas,
     description: Array<string>,
-    input_values: InputState
+    input_values: InputState,
+    calendar_data: CalendGen.GeneratorOutput | null
 }
 
 export class CalendarGenerator extends React.Component<{}, CalendarGeneratorState> {
@@ -39,7 +40,8 @@ export class CalendarGenerator extends React.Component<{}, CalendarGeneratorStat
         this.state = {
             viz: new Visualization.OrbitCanvas(500, 500, '#visualization'),
             description: [],
-            input_values: this.initial_state
+            input_values: this.initial_state,
+            calendar_data: null 
         }
     }
 
@@ -63,7 +65,8 @@ export class CalendarGenerator extends React.Component<{}, CalendarGeneratorStat
         this.state.viz.draw_orbit(e);
         this.state.viz.draw_seasons(e, Math.atan2(6, 4));
         let result = CalendGen.generateCalendarFromOrbit(planet_data, star_mass, [{ mass: moon_mass, periapsis: moon_perigee, apoapsis: moon_perigee }]);
-        this.setDescriptions(result.description);
+        this.setDescriptions(result.calendar.description);
+        this.setState({calendar_data: result});
     }
 
     componentDidMount() {
@@ -88,15 +91,15 @@ export class CalendarGenerator extends React.Component<{}, CalendarGeneratorStat
     }
 
     handleInputUpdate(id: string, new_value: number) {
-        this.setState({ input_values: update(this.state.input_values, { [id]: {$set: new_value} })});
+        this.setState({ input_values: update(this.state.input_values, { [id]: { $set: new_value } }) });
     }
 
     render() {
         return (
             <div>
-                <GeneratorInput {...extend(this.initial_state, { onClick: () => this.runGeneration(), onChange: (id, v) => this.handleInputUpdate(id,v)}) } />
+                <GeneratorInput {...extend(this.initial_state, { onClick: () => this.runGeneration(), onChange: (id, v) => this.handleInputUpdate(id, v) }) } />
                 <CalendarDescription description={this.state.description} />
-                <CalendarExample />
+                { (this.state.calendar_data !== null) ? <CalendarExample calendar={this.state.calendar_data.calendar} days_per_week={7} seasons={this.state.calendar_data.seasons}/> : false }
             </div>
         );
     }
