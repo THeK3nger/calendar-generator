@@ -5,7 +5,8 @@
         "noImplicitAny": false,
         "sourceMap": true,
         "outDir": "./dist/",
-        "strict": true
+        "strict": true,
+        "jsx": "react"
     },
     "files": [
         "src/app.ts",

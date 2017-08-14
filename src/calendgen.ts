@@ -34,12 +34,17 @@ interface CalendarParameters {
     leap: LeapYearData
 };
 
-interface CalendarGeneratorOutput {
+export interface CalendarGeneratorOutput {
     description: string[],
     calendar_parameters: CalendarParameters
 };
 
-export function generateCalendarFromOrbit(planet_data: PlanetData, sun_mass: number, moons: Array<MoonData>): CalendarGeneratorOutput {
+export interface GeneratorOutput {
+    calendar: CalendarGeneratorOutput,
+    seasons: SeasonsParameters
+}
+
+export function generateCalendarFromOrbit(planet_data: PlanetData, sun_mass: number, moons: Array<MoonData>): GeneratorOutput {
     const planet_axis_major = (planet_data.periapsis + planet_data.apoapsis) / 2;
     const planet_mass = planet_data.mass;
     const planet_day_duration = planet_data.day_duration;
@@ -57,8 +62,8 @@ export function generateCalendarFromOrbit(planet_data: PlanetData, sun_mass: num
 
     const seasons = computeSeasons(0, 6, 4, eccentricity, planet_year);
     const calendar = generateCalendarFromPeriod(planet_year, moon_periods, planet_day_duration);
-    instantiateCalendar(calendar, 7, seasons);
-    return calendar;
+    //instantiateCalendar(calendar, 7, seasons);
+    return { calendar, seasons };
 }
 
 function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<number>, planet_day_duration: number = 86400): CalendarGeneratorOutput {
@@ -112,142 +117,6 @@ function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<n
     return { description: calendar_description, calendar_parameters: output_parameters };
 }
 
-function generateMonthTableHeader(month_table: JQuery, days_per_week: number, day_names: String[]) {
-    let month_table_header = "";
-    for (let d = 0; d < days_per_week; d++) {
-        month_table_header += `<td>${day_names[d]}</td>`;
-    }
-    month_table.append(`<tr>${month_table_header}</tr>`);
-}
-
-function generateMonthTableContents(month_table: JQuery, starting_week_day: number, days_per_week, days_per_month: Array<number>, current_month: number, season_days: undefined | number = undefined): number {
-    let week_d = starting_week_day;
-    let m = current_month;
-    let table_day_index = -(week_d % days_per_week); // This is used for aligning the first day to the current week day.
-    let row_day_split = 0;
-    let month_week_line = ""
-    // Fill the empty cells at the begining of the month.
-    // This depends on the starting week day for the current month.
-    while (table_day_index < 0) {
-        month_week_line += "<td></td>";
-        row_day_split++;
-        table_day_index++;
-    }
-    // Now fill the actual table.
-    for (let dm = 0; dm < days_per_month[m]; dm++) {
-        if (season_days === dm) {
-            month_week_line += `<td style="color: red">${dm + 1}</td>`;
-        } else {
-            month_week_line += `<td>${dm + 1}</td>`;
-        }
-        table_day_index++;
-        week_d++;
-        row_day_split++;
-        if (row_day_split >= days_per_week) {
-            row_day_split = row_day_split - days_per_week;
-            month_table.append(`<tr>${month_week_line}</tr>`);
-            month_week_line = "";
-        }
-    }
-    // Fill the remaining cells in the last row (if any).
-    while (row_day_split != 0 && row_day_split < days_per_week) {
-        month_week_line += "<td></td>";
-        row_day_split++;
-        table_day_index++;
-    }
-    if (month_week_line != "") {
-        month_table.append(`<tr>${month_week_line}</tr>`);
-    }
-    return week_d % days_per_week;
-}
-
-function instantiateCalendar(calendar: CalendarGeneratorOutput, days_per_week: number, seasons: SeasonsParameters) {
-    $("#calendar-example div").remove();
-    const calendar_parameter = calendar.calendar_parameters;
-
-    const year_days = calendar_parameter.days_per_year;
-    const months = calendar_parameter.months_per_year;
-    const month_base_days = calendar_parameter.base_days_per_month;
-
-    let day_names = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"];
-
-    // Allocate all the spare days into random months.
-    let days_remainder = year_days - months * month_base_days;
-    let days_per_month: Array<number> = [];
-    for (let i = 0; i < months; i++) {
-        days_per_month.push(month_base_days);
-    }
-    for (let i = 0; i < days_remainder; i++) {
-        days_per_month[Math.floor(Math.random() * months)] += 1;
-    }
-    console.log("[DEBUG] Days per Month: ")
-    console.log(days_per_month);
-    console.log(seasons);
-
-    let spring_equinox = Math.floor(seasons.spring_equinox / 86400); // TODO: Get this from the parameter.
-    let spring_month = 0;
-    for (let i = 0; i < months; i++) {
-        if (spring_equinox < days_per_month[i]) {
-            break;
-        }
-        spring_equinox -= days_per_month[i];
-        spring_month = i;
-    }
-
-    let summer_solstice = Math.floor(seasons.summer_solstice / 86400); // TODO: Get this from the parameter.
-    let summer_month = 0;
-    for (let i = 0; i < months; i++) {
-        if (summer_solstice < days_per_month[i]) {
-            break;
-        }
-        summer_solstice -= days_per_month[i];
-        summer_month = i;
-    }
-
-    let autumn_equinox = Math.floor(seasons.autumn_equinox / 86400); // TODO: Get this from the parameter.
-    let autumn_month = 0;
-    for (let i = 0; i < months; i++) {
-        if (autumn_equinox < days_per_month[i]) {
-            break;
-        }
-        autumn_equinox -= days_per_month[i];
-        autumn_month = i;
-    }
-
-    let winter_solstice = Math.floor(seasons.winter_solstice / 86400); // TODO: Get this from the parameter.
-    let winter_month = 0;
-    for (let i = 0; i < months; i++) {
-        if (winter_solstice < days_per_month[i]) {
-            break;
-        }
-        winter_solstice -= days_per_month[i];
-        winter_month = i;
-    }
-
-    calendar.description.push(`Spring Equinox occurs in the ${spring_month + 1}th month on the ${spring_equinox + 1}th day.`);
-    calendar.description.push(`Summer Solstice occurs in the ${summer_month + 1}th month on the ${summer_solstice + 1}th day.`);
-    calendar.description.push(`Spring Equinox occurs in the ${autumn_month + 1}th month on the ${autumn_equinox + 1}th day.`);
-    calendar.description.push(`Spring Equinox occurs in the ${winter_month + 1}th month on the ${winter_solstice + 1}th day.`);
-
-    console.log(`SpringEquinox = ${spring_month} ${spring_equinox + 1}th`);
-
-    let week_d = 0
-    for (let m = 0; m < months; m++) {
-        let month_div = $(`<div class="month"></div>`);
-        month_div.append(`<h4>Month ${m + 1}</h4>`)
-        let month_table = $(`<table border="1"></table>`);
-        generateMonthTableHeader(month_table, days_per_week, day_names);
-
-        if (m === spring_month)
-            week_d = generateMonthTableContents(month_table, week_d, days_per_week, days_per_month, m, spring_equinox);
-        else
-            week_d = generateMonthTableContents(month_table, week_d, days_per_week, days_per_month, m);
-
-        month_table.appendTo(month_div);
-        month_div.appendTo("#calendar-example");
-    }
-}
-
 function continuedFractions(num: number, order: number): Array<number> {
     let result: Array<number> = [];
     let remainer = num;
@@ -267,7 +136,7 @@ function thirdOrderConvergent(cf: Array<number>): [number, number] {
 
 // SEASONS
 
-interface SeasonsParameters {
+export interface SeasonsParameters {
     spring_equinox: number, /// Time in seconds for the first equinox.
     summer_solstice: number,
     autumn_equinox: number,
