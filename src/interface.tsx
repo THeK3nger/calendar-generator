@@ -3,8 +3,7 @@ import * as ReactDOM from "react-dom"
 
 import * as update from 'immutability-helper'
 
-import { Hello } from "./components/test"
-import { GeneratorInput, GeneratorInputProps, InputState } from "./components/input"
+import { GeneratorInput, InputState } from "./components/input"
 import { CalendarDescription } from "./components/calendar_description"
 import { CalendarExample } from "./components/calendar_example"
 
@@ -32,7 +31,7 @@ export class CalendarGenerator extends React.Component<{}, CalendarGeneratorStat
         moon_apogee: Physic.moon_apogee / 1000,
         moon_perigee: Physic.moon_perigee / 1000,
         day_duration: 86400,
-    }
+    };
 
     constructor() {
         super();
@@ -64,7 +63,7 @@ export class CalendarGenerator extends React.Component<{}, CalendarGeneratorStat
         let e = (planet_aphelion - planet_perihelion) / (planet_aphelion + planet_perihelion);
         this.state.viz.draw_orbit(e);
         this.state.viz.draw_seasons(e, Math.atan2(6, 4));
-        let result = CalendGen.generateCalendarFromOrbit(planet_data, star_mass, [{ mass: moon_mass, periapsis: moon_perigee, apoapsis: moon_perigee }]);
+        let result = CalendGen.generateCalendarFromOrbit(planet_data, star_mass, [{ mass: moon_mass, periapsis: moon_perigee, apoapsis: moon_apogee }]);
         this.setDescriptions(result.calendar.description);
         this.setState({calendar_data: result});
     }

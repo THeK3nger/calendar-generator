@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { CalendarGeneratorOutput, SeasonsParameters } from "../calendgen"
 
-export interface CalendarExampleProps extends React.Props<{}> {
+export interface CalendarExampleProps {
     calendar: CalendarGeneratorOutput, days_per_week: number, seasons: SeasonsParameters
 }
 
@@ -73,7 +73,7 @@ export class MonthTable extends React.Component<MonthTableProps, {}> {
         // If empty_start > 0 fill the empty cells at the beginning of week.
         // If empty_end > 0 fill the empty cells at the end of the week.
         // Only one between empty start and empty end can be > 0!
-        let week: Array<JSX.Element> = []
+        let week: Array<JSX.Element> = [];
         let starting = empty_start;
         let ending = this.props.days_per_week - empty_end;
         let idx = 0;
@@ -105,12 +105,12 @@ export class MonthTable extends React.Component<MonthTableProps, {}> {
         let week_num = 0;
 
         // First Week
-        weeks.push(this.renderMonthWeek(week_num, current_day, this.props.starting_day))
+        weeks.push(this.renderMonthWeek(week_num, current_day, this.props.starting_day));
         current_day += this.props.days_per_week - this.props.starting_day;
         week_num++;
         while (current_day < this.props.month_day) {
             if (current_day + this.props.days_per_week < this.props.month_day) {
-                weeks.push(this.renderMonthWeek(week_num, current_day))
+                weeks.push(this.renderMonthWeek(week_num, current_day));
                 week_num++;
                 current_day += this.props.days_per_week;
             } else {

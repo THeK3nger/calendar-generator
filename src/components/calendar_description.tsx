@@ -1,6 +1,6 @@
 import * as React from "react";
 
-export interface CalendarDescriptionProps extends React.Props<{}> {
+export interface CalendarDescriptionProps {
     description: Array<string>
 }
 

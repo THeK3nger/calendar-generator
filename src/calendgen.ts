@@ -32,12 +32,12 @@ interface CalendarParameters {
     months_per_year: number,
     base_days_per_month: number,
     leap: LeapYearData
-};
+}
 
 export interface CalendarGeneratorOutput {
     description: string[],
     calendar_parameters: CalendarParameters
-};
+}
 
 export interface GeneratorOutput {
     calendar: CalendarGeneratorOutput,
@@ -56,7 +56,7 @@ export function generateCalendarFromOrbit(planet_data: PlanetData, sun_mass: num
     let moon_periods: Array<number> = [];
     // Compute moon periods.
     for (let moon of moons) {
-        let moon_axis_major = (moon.periapsis + moon.apoapsis) / 2
+        let moon_axis_major = (moon.periapsis + moon.apoapsis) / 2;
         moon_periods.push(Physic.orbital_period(planet_mass, moon_axis_major, moon.mass));
     }
 
@@ -89,7 +89,7 @@ function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<n
         leap: { leap_total_days: 2, leap_period: 3 },
         months_per_year: 12,
         base_days_per_month: 30
-    }
+    };
 
     if (moon_periods.length > 0) {
         // TODO: For now, there is only one moon. In the future we may support multiple moons.

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { NumericTextInputProps, NumericTextInput } from "./numeric_text_input";
+import { NumericTextInput } from "./numeric_text_input";
 
 export interface InputState {
     star_mass: number,
@@ -38,7 +38,7 @@ export class GeneratorInput extends React.Component<GeneratorInputProps, {}> {
                     <NumericTextInput id="day_duration" label="Planet's Day Duration in Seconds" defaultValue={this.props.day_duration} onChange={(s,n) => this.handleOnChange(s,n)}/>
                     <NumericTextInput id="moon_mass" label="Moon Mass (Kg)" defaultValue={this.props.moon_mass} onChange={(s,n) => this.handleOnChange(s,n)}/>
                     <NumericTextInput id="moon_perigee" label="Moon Perigee (Km)" defaultValue={this.props.moon_perigee} onChange={(s,n) => this.handleOnChange(s,n)}/>
-                    <NumericTextInput id="moon_apogee" label="Moon Apogee (Kg)" defaultValue={this.props.moon_apogee}onChange={(s,n) => this.handleOnChange(s,n)} />
+                    <NumericTextInput id="moon_apogee" label="Moon Apogee (Kg)" defaultValue={this.props.moon_apogee} onChange={(s,n) => this.handleOnChange(s,n)} />
                     <p><button id="generateButton" type="button" onClick={() => this.props.onClick() }>Generate</button></p>
                 </form>
             </div>
