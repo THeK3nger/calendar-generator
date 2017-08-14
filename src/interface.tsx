@@ -1,9 +1,10 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
+import * as React from "react"
+import * as ReactDOM from "react-dom"
 
-import { Hello } from "./components/test";
-import { GeneratorInput, GeneratorInputProps } from "./components/input";
-import { CalendarDescription } from "./components/calendar_description";
+import { Hello } from "./components/test"
+import { GeneratorInput, GeneratorInputProps } from "./components/input"
+import { CalendarDescription } from "./components/calendar_description"
+import { CalendarExample } from "./components/calendar_example"
 
 import * as Physic from "./physic"
 import * as Visualization from "./visualization"
@@ -19,11 +20,11 @@ export class CalendarGenerator extends React.Component<{}, CalendarGeneratorStat
     initial_values: GeneratorInputProps = {
         star_mass: Physic.sun_mass,
         planet_mass: Physic.earth_mass,
-        planet_aphelion: Physic.earth_aphelion,
-        planet_perihelion: Physic.earth_perihelion,
+        planet_aphelion: Physic.earth_aphelion/1000,
+        planet_perihelion: Physic.earth_perihelion/1000,
         moon_mass: Physic.moon_mass,
-        moon_apogee: Physic.moon_apogee,
-        moon_perigee: Physic.moon_perigee,
+        moon_apogee: Physic.moon_apogee/1000,
+        moon_perigee: Physic.moon_perigee/1000,
         day_duration: 86400,
         onClick: () => this.runGeneration()
     }
@@ -86,6 +87,7 @@ export class CalendarGenerator extends React.Component<{}, CalendarGeneratorStat
             <div>
                 <GeneratorInput {...this.initial_values} />
                 <CalendarDescription description={this.state.description} />
+                <CalendarExample />
             </div>
         );
     }
