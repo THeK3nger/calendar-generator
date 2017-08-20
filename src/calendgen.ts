@@ -1,30 +1,27 @@
 import * as Physic from "./physic"
 import * as Newton from "./newton"
 
-interface MoonData {
-    periapsis: number,
-    apoapsis: number,
-    mass: number
-}
-
-interface PlanetData {
-    periapsis: number,
-    apoapsis: number,
-    mass: number,
-    day_duration: number
-}
-
 interface LeapYearData { leap_total_days: number, leap_period: number }
+
+interface OrbitalBody {
+    mass: number
+    rotation: number
+    orbit: OrbitalParameters
+}
+
+interface SystemParameters {
+    planet: OrbitalBody
+    star_mass: number
+    satellites: Array<OrbitalBody>
+}
 
 /**
  * Define the orbital parameters in a two-body problem.
  */
 interface OrbitalParameters {
-    eccentricity: number, // Shape of the ellipse, describing how much it is elongated compared to a circle.
-    semimajor_axis: number, // The sum of the periapsis and apoapsis distances divided by two.
-    inclination: number, // Vertical tilt of the ellipse with respect to the reference plane.
-    ascending_node: number, // horizontally orients the ascending node of the ellipse with respect to the reference frame's vernal point.
-    argument_of_periapsis: number, // defines the orientation of the ellipse in the orbital plane
+    periapsis: number,
+    apoapsis: number,
+    inclination?: number,
 }
 
 interface CalendarParameters {
@@ -44,19 +41,21 @@ export interface GeneratorOutput {
     seasons: SeasonsParameters
 }
 
-export function generateCalendarFromOrbit(planet_data: PlanetData, sun_mass: number, moons: Array<MoonData>): GeneratorOutput {
-    const planet_axis_major = (planet_data.periapsis + planet_data.apoapsis) / 2;
-    const planet_mass = planet_data.mass;
-    const planet_day_duration = planet_data.day_duration;
-    const eccentricity = (planet_data.apoapsis - planet_data.periapsis) / (planet_data.apoapsis + planet_data.periapsis);
+export function generateCalendarFromOrbit(system_data: SystemParameters): GeneratorOutput {
+    const planet_apoapsis = system_data.planet.orbit.apoapsis;
+    const planet_periapsis = system_data.planet.orbit.periapsis;
+    const planet_axis_major = (planet_apoapsis + planet_periapsis) / 2;
+    const planet_mass = system_data.planet.mass;
+    const planet_day_duration = system_data.planet.rotation;
+    const eccentricity = (planet_apoapsis - planet_periapsis) / (planet_apoapsis + planet_periapsis);
 
     // Compute planet orbital period.
-    let planet_year = Physic.orbital_period(sun_mass, planet_axis_major, planet_mass);
+    let planet_year = Physic.orbital_period(system_data.star_mass, planet_axis_major, planet_mass);
 
     let moon_periods: Array<number> = [];
     // Compute moon periods.
-    for (let moon of moons) {
-        let moon_axis_major = (moon.periapsis + moon.apoapsis) / 2;
+    for (let moon of system_data.satellites) {
+        let moon_axis_major = (moon.orbit.periapsis + moon.orbit.apoapsis) / 2;
         moon_periods.push(Physic.orbital_period(planet_mass, moon_axis_major, moon.mass));
     }
 

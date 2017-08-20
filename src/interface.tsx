@@ -54,16 +54,31 @@ export class CalendarGenerator extends React.Component<{}, CalendarGeneratorStat
         let moon_perigee = this.state.input_values.moon_perigee * 1000;
         let moon_apogee = this.state.input_values.moon_apogee * 1000;
         let day_duration = this.state.input_values.day_duration;
-        let planet_data = {
-            periapsis: planet_perihelion,
-            apoapsis: planet_aphelion,
-            mass: planet_mass,
-            day_duration: day_duration
+        let system_parameters = {
+            planet: {
+                mass: planet_mass,
+                rotation: day_duration,
+                orbit: {
+                    periapsis: planet_perihelion,
+                    apoapsis: planet_aphelion,
+                }
+            },
+            star_mass: star_mass,
+            satellites: [
+                {
+                    mass: moon_mass,
+                    rotation: day_duration,
+                    orbit: {
+                        periapsis: moon_perigee,
+                        apoapsis: moon_apogee,
+                    }
+                }
+            ]
         };
         let e = (planet_aphelion - planet_perihelion) / (planet_aphelion + planet_perihelion);
         this.state.viz.draw_orbit(e);
         this.state.viz.draw_seasons(e, Math.atan2(6, 4));
-        let result = CalendGen.generateCalendarFromOrbit(planet_data, star_mass, [{ mass: moon_mass, periapsis: moon_perigee, apoapsis: moon_apogee }]);
+        let result = CalendGen.generateCalendarFromOrbit(system_parameters);
         this.setDescriptions(result.calendar.description);
         this.setState({calendar_data: result});
     }
