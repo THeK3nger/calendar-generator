@@ -1,8 +1,6 @@
 import * as Physic from "./physic"
 import * as Newton from "./newton"
 
-interface LeapYearData { leap_total_days: number, leap_period: number }
-
 interface OrbitalBody {
     mass: number
     rotation: number
@@ -26,14 +24,23 @@ interface OrbitalParameters {
 
 interface CalendarParameters {
     days_per_year: number,
+    moon_day_period: number,
     months_per_year: number,
     base_days_per_month: number,
     leap: LeapYearData
 }
 
+interface LeapYearData { leap_total_days: number, leap_period: number }
+
 export interface CalendarGeneratorOutput {
-    description: string[],
     calendar_parameters: CalendarParameters
+}
+
+export interface SeasonsParameters {
+    spring_equinox: number, /// Time in seconds for the first equinox.
+    summer_solstice: number,
+    autumn_equinox: number,
+    winter_solstice: number
 }
 
 export interface GeneratorOutput {
@@ -66,25 +73,16 @@ export function generateCalendarFromOrbit(system_data: SystemParameters): Genera
 }
 
 function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<number>, planet_day_duration: number = 86400): CalendarGeneratorOutput {
-    let calendar_description: Array<string> = [];
-
-    let planetToEarthDays = planet_day_duration / 86400;
     let year_days_full = Physic.secondsToDays(planet_period, planet_day_duration);
     let year_days = Math.floor(year_days_full);
-    if (planetToEarthDays != 1) {
-        let earth_days = Math.floor(year_days_full * planetToEarthDays);
-        calendar_description.push(`Generating a calendar for a planet with a year of ${year_days} days (${earth_days} Earth Days).`);
-    } else {
-        calendar_description.push(`Generating a calendar for a planet with a year of ${year_days} days`);
-    }
 
     // Compute Leap Years.
     let planet_cf = continuedFractions(year_days_full, 3);
     let third_convergent = thirdOrderConvergent(planet_cf);
-    calendar_description.push(`Calendar has approximately ${third_convergent[0]} leap days every ${third_convergent[1]} years.`);
 
     let output_parameters: CalendarParameters = {
         days_per_year: 365,
+        moon_day_period: 0,
         leap: { leap_total_days: 2, leap_period: 3 },
         months_per_year: 12,
         base_days_per_month: 30
@@ -92,28 +90,53 @@ function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<n
 
     if (moon_periods.length > 0) {
         // TODO: For now, there is only one moon. In the future we may support multiple moons.
-        // calendar_description.push(`There are ${moon_periods.length} moons. Using principal moon.`); 
         let moon_day_period = Physic.secondsToDays(moon_periods[0], planet_day_duration);
-        if (planetToEarthDays != 1) {
-            let moon_earth_days = Math.floor(moon_day_period * planetToEarthDays);
-            calendar_description.push(`Principal Moon Period is ${moon_day_period} (almost ${moon_earth_days} Earth Days)`);
-        } else {
-            calendar_description.push(`Principal Moon Period is ${moon_day_period}`);
-        }
         let month_days = Math.floor(Physic.secondsToDays(moon_periods[0], planet_day_duration));
         let lunar_months = Math.floor(year_days / month_days);
         let days_remainder = year_days - lunar_months * month_days;
-        calendar_description.push(`Based on the principal satellite, we can subdivide the year into ${lunar_months} lunar months.`);
-        calendar_description.push(`This leaves us with ${days_remainder} days to be distributed.`);
 
         output_parameters = {
             days_per_year: year_days,
             leap: { leap_total_days: third_convergent[0], leap_period: third_convergent[1] },
             months_per_year: lunar_months,
+            moon_day_period: moon_day_period,
             base_days_per_month: month_days
         }
     }
-    return { description: calendar_description, calendar_parameters: output_parameters };
+    return { calendar_parameters: output_parameters };
+}
+
+export function describeCalendar(input_parameters: SystemParameters, output_calendar: GeneratorOutput): Array<string> {
+    let calendar_description: Array<string> = [];
+
+    const planet_day_duration = input_parameters.planet.rotation;
+    const planetToEarthDays = planet_day_duration / 86400;
+    const year_days = output_calendar.calendar.calendar_parameters.days_per_year;
+    if (planetToEarthDays != 1) {
+        const earth_days = year_days * planetToEarthDays;
+        calendar_description.push(`Generating a calendar for a planet with a year of ${year_days} days (about ${earth_days} Earth Days).`);
+    } else {
+        calendar_description.push(`Generating a calendar for a planet with a year of ${year_days} days`);
+    }
+
+    const leap_days = output_calendar.calendar.calendar_parameters.leap.leap_total_days;
+    const leap_period = output_calendar.calendar.calendar_parameters.leap.leap_period;
+    calendar_description.push(`Calendar has approximately ${leap_days} leap days every ${leap_period} years.`);
+
+    const moon_day_period = output_calendar.calendar.calendar_parameters.moon_day_period;
+    if (planetToEarthDays != 1) {
+        let moon_earth_days = moon_day_period * planetToEarthDays;
+        calendar_description.push(`Principal Moon Period is ${moon_day_period} (about ${moon_earth_days} Earth Days)`);
+    } else {
+        calendar_description.push(`Principal Moon Period is ${moon_day_period}`);
+    }
+
+    const lunar_months = output_calendar.calendar.calendar_parameters.months_per_year;
+    calendar_description.push(`Based on the principal satellite, we can subdivide the year into ${lunar_months} lunar months.`);
+    let days_remainder = year_days - lunar_months * output_calendar.calendar.calendar_parameters.base_days_per_month;
+    calendar_description.push(`This leaves us with ${days_remainder} days to be distributed.`);
+
+    return calendar_description;
 }
 
 function continuedFractions(num: number, order: number): Array<number> {
@@ -134,13 +157,6 @@ function thirdOrderConvergent(cf: Array<number>): [number, number] {
 }
 
 // SEASONS
-
-export interface SeasonsParameters {
-    spring_equinox: number, /// Time in seconds for the first equinox.
-    summer_solstice: number,
-    autumn_equinox: number,
-    winter_solstice: number
-}
 
 export function computeSeasons(axial_tilt: number, A: number, B: number, eccentricity: number, period: number): SeasonsParameters {
     let E = Newton.NewtonRoot(
