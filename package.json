@@ -1,20 +1,35 @@
 {
+  "version": "0.3.0",
+  "author": {
+    "email": "thek3nger@gmail.com",
+    "name": "Davide Aversa"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:THeK3nger/calendar-generator.git"
+  },
   "scripts": {
     "start": "http-server ./dist -p 8080",
     "test": "mocha -r ts-node/register --require amd-loader ./tests/**/*",
-    "build": "node_modules/webpack/bin/webpack.js"
+    "build": "node ./node_modules/webpack/bin/webpack.js"
   },
   "dependencies": {
     "@types/chai": "^3.5.2",
     "@types/d3": "^4.9.0",
     "@types/jquery": "^2.0.41",
+    "@types/loglevel": "^1.4.29",
     "@types/mocha": "^2.2.41",
+    "@types/react": "^16.0.2",
+    "@types/react-dom": "^15.5.2",
     "amd-loader": "^0.0.8",
     "chai": "^3.5.0",
+    "immutability-helper": "^2.3.1",
+    "loglevel": "^1.4.1",
     "mocha": "^3.4.1",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
     "ts-node": "^3.0.4",
-    "typescript": "^2.3.4",
-    "vue": "^2.4.2"
+    "typescript": "^2.3.4"
   },
   "devDependencies": {
     "ts-loader": "^2.3.2",

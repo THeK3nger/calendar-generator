@@ -20,7 +20,9 @@ module.exports = {
     },
     externals: {
         jquery: 'jQuery',
-        d3: 'd3'
+        d3: 'd3',
+        react: "React",
+        "react-dom": "ReactDOM"
     },
     devtool: 'inline-source-map',
 };

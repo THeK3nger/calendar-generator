@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2017-08-21
+
+### Changed
+
+ - This release introduces only changes but they are huge changes. I rewritten the interface in React, refactored the code, make everything more modular and understandable. Now everything is more clear and, in some sense, performing. It should also allow me to add and change things without breaking everything in the process. In the next release (v0.4) I will focus on lunar phases. I promise.
+
 ## [0.2.5] - 2017-08-12
 
 ### Changed

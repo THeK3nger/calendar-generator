@@ -1,250 +1,188 @@
 import * as Physic from "./physic"
 import * as Newton from "./newton"
 
-interface MoonData {
-    periapsis: number,
-    apoapsis: number,
-    mass: number
+/**
+ * `OrbitalBody` defines data representing information about an orbiting body of the solar system.
+ * 
+ * This can be referred to a planet orbiting around a star, or a satellite orbiting a planet.
+ */
+interface OrbitalBody {
+    mass: number                /// The orbital body mass in Kg.
+    rotation: number            /// The rotation period in seconds.
+    orbit: OrbitalParameters    /// The orbital parameters.
+    axial_tilt?: number         /// Axial tilt for the body rotation wrt the orbital plane.
 }
 
-interface PlanetData {
-    periapsis: number,
-    apoapsis: number,
-    mass: number,
-    day_duration: number
+/**
+ * `SystemParameters` describes the parameters for a planet in star system.
+ * 
+ * It includes the star mass, and the planet and satellites orbital information.
+ */
+interface SystemParameters {
+    planet: OrbitalBody             /// The planet.
+    star_mass: number               /// The orbiting star mass in Kg.
+    satellites: Array<OrbitalBody>  /// A list of satellites.
 }
 
+/**
+ * Define the orbital parameters for an orbital body.
+ */
+interface OrbitalParameters {
+    periapsis: number       /// The celestial body orbit periapsis in meters.
+    apoapsis: number        /// The celestial body orbit apopasis in meters.
+    inclination?: number    /// The inclination of the orbital plane respect to the system reference plane.
+}
+
+/**
+ * The output data for the actual calendar.
+ */
+interface CalendarParameters {
+    days_per_year: number           /// Number of days in a year.
+    moon_day_period: number         /// Number of days in a principal moon revolution.
+    months_per_year: number         /// How many moon revolutions there are in a year.
+    base_days_per_month: number     /// Number of days in a principal moon revolution (floored). // TODO: This is probably superfluous.
+    leap: LeapYearData              /// Information about leap days.
+}
+
+/**
+ * Represent LeapYear information. 
+ */
 interface LeapYearData { leap_total_days: number, leap_period: number }
 
 /**
- * Define the orbital parameters in a two-body problem.
+ * Output of the calendar generator. // TODO: Probably superfluous.
  */
-interface OrbitalParameters {
-    eccentricity: number, // Shape of the ellipse, describing how much it is elongated compared to a circle.
-    semimajor_axis: number, // The sum of the periapsis and apoapsis distances divided by two.
-    inclination: number, // Vertical tilt of the ellipse with respect to the reference plane.
-    ascending_node: number, // horizontally orients the ascending node of the ellipse with respect to the reference frame's vernal point.
-    argument_of_periapsis: number, // defines the orientation of the ellipse in the orbital plane
+export interface CalendarGeneratorOutput {
+    calendar_parameters: CalendarParameters
 }
 
-interface CalendarParameters {
-    days_per_year: number,
-    months_per_year: number,
-    base_days_per_month: number,
-    leap: LeapYearData
-};
+/**
+ * Computed astronomical season-related events.
+ */
+export interface SeasonsParameters {
+    spring_equinox: number, /// Time in seconds for the first equinox.
+    summer_solstice: number,
+    autumn_equinox: number,
+    winter_solstice: number
+}
 
-interface CalendarGeneratorOutput {
-    description: string[],
-    calendar_parameters: CalendarParameters
-};
+/**
+ * Encapsulate the global generator output.
+ */
+export interface GeneratorOutput {
+    calendar: CalendarGeneratorOutput,
+    seasons: SeasonsParameters
+}
 
-export function generateCalendarFromOrbit(planet_data: PlanetData, sun_mass: number, moons: Array<MoonData>): CalendarGeneratorOutput {
-    const planet_axis_major = (planet_data.periapsis + planet_data.apoapsis) / 2;
-    const planet_mass = planet_data.mass;
-    const planet_day_duration = planet_data.day_duration;
-    const eccentricity = (planet_data.apoapsis - planet_data.periapsis) / (planet_data.apoapsis + planet_data.periapsis);
+/**
+ * The main calendar generator function
+ * @param system_data The input star system data for the planet.
+ * @returns An instance of a generated calendar for the planet.
+ */
+export function generateCalendarFromOrbit(system_data: SystemParameters): GeneratorOutput {
+    const planet_apoapsis = system_data.planet.orbit.apoapsis;
+    const planet_periapsis = system_data.planet.orbit.periapsis;
+    const planet_axis_major = (planet_apoapsis + planet_periapsis) / 2;
+    const planet_mass = system_data.planet.mass;
+    const planet_day_duration = system_data.planet.rotation;
+    const eccentricity = (planet_apoapsis - planet_periapsis) / (planet_apoapsis + planet_periapsis);
 
     // Compute planet orbital period.
-    let planet_year = Physic.orbital_period(sun_mass, planet_axis_major, planet_mass);
+    let planet_year = Physic.orbital_period(system_data.star_mass, planet_axis_major, planet_mass);
 
-    let moon_periods = [];
+    let moon_periods: Array<number> = [];
     // Compute moon periods.
-    for (let moon of moons) {
-        let moon_axis_major = (moon.periapsis + moon.apoapsis) / 2
+    for (let moon of system_data.satellites) {
+        let moon_axis_major = (moon.orbit.periapsis + moon.orbit.apoapsis) / 2;
         moon_periods.push(Physic.orbital_period(planet_mass, moon_axis_major, moon.mass));
     }
 
     const seasons = computeSeasons(0, 6, 4, eccentricity, planet_year);
     const calendar = generateCalendarFromPeriod(planet_year, moon_periods, planet_day_duration);
-    instantiateCalendar(calendar, 7, seasons);
-    return calendar;
+    //instantiateCalendar(calendar, 7, seasons);
+    return { calendar, seasons };
 }
 
 function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<number>, planet_day_duration: number = 86400): CalendarGeneratorOutput {
-    let calendar_description = [];
-
-    let planetToEarthDays = planet_day_duration / 86400;
     let year_days_full = Physic.secondsToDays(planet_period, planet_day_duration);
     let year_days = Math.floor(year_days_full);
-    if (planetToEarthDays != 1) {
-        let earth_days = Math.floor(year_days_full * planetToEarthDays);
-        calendar_description.push(`Generating a calendar for a planet with a year of ${year_days} days (${earth_days} Earth Days).`);
-    } else {
-        calendar_description.push(`Generating a calendar for a planet with a year of ${year_days} days`);
-    }
 
     // Compute Leap Years.
     let planet_cf = continuedFractions(year_days_full, 3);
     let third_convergent = thirdOrderConvergent(planet_cf);
-    calendar_description.push(`Calendar has approximately ${third_convergent[0]} leap days every ${third_convergent[1]} years.`);
 
-    let output_parameters: CalendarParameters;
+    let output_parameters: CalendarParameters = {
+        days_per_year: 365,
+        moon_day_period: 0,
+        leap: { leap_total_days: 2, leap_period: 3 },
+        months_per_year: 12,
+        base_days_per_month: 30
+    };
 
     if (moon_periods.length > 0) {
         // TODO: For now, there is only one moon. In the future we may support multiple moons.
-        // calendar_description.push(`There are ${moon_periods.length} moons. Using principal moon.`); 
         let moon_day_period = Physic.secondsToDays(moon_periods[0], planet_day_duration);
-        if (planetToEarthDays != 1) {
-            let moon_earth_days = Math.floor(moon_day_period * planetToEarthDays);
-            calendar_description.push(`Principal Moon Period is ${moon_day_period} (almost ${moon_earth_days} Earth Days)`);
-        } else {
-            calendar_description.push(`Principal Moon Period is ${moon_day_period}`);
-        }
         let month_days = Math.floor(Physic.secondsToDays(moon_periods[0], planet_day_duration));
         let lunar_months = Math.floor(year_days / month_days);
         let days_remainder = year_days - lunar_months * month_days;
-        calendar_description.push(`Based on the principal satellite, we can subdivide the year into ${lunar_months} lunar months.`);
-        calendar_description.push(`This leaves us with ${days_remainder} days to be distributed.`);
 
         output_parameters = {
             days_per_year: year_days,
             leap: { leap_total_days: third_convergent[0], leap_period: third_convergent[1] },
             months_per_year: lunar_months,
+            moon_day_period: moon_day_period,
             base_days_per_month: month_days
         }
     }
-    return { description: calendar_description, calendar_parameters: output_parameters };
+    return { calendar_parameters: output_parameters };
 }
 
-function generateMonthTableHeader(month_table: JQuery, days_per_week: number, day_names: String[]) {
-    let month_table_header = "";
-    for (let d = 0; d < days_per_week; d++) {
-        month_table_header += `<td>${day_names[d]}</td>`;
+/**
+ * Given the input and the output, produces a textual description of the planet calendar.
+ * @param input_parameters The star system input parameters.
+ * @param output_calendar The output of the calendar generation.
+ * @returns A textual description of the planed calendar.
+ */
+export function describeCalendar(input_parameters: SystemParameters, output_calendar: GeneratorOutput): Array<string> {
+    let calendar_description: Array<string> = [];
+
+    const planet_day_duration = input_parameters.planet.rotation;
+    const planetToEarthDays = planet_day_duration / 86400;
+    const year_days = output_calendar.calendar.calendar_parameters.days_per_year;
+    if (planetToEarthDays != 1) {
+        const earth_days = year_days * planetToEarthDays;
+        calendar_description.push(`Generating a calendar for a planet with a year of ${year_days} days (about ${earth_days} Earth Days).`);
+    } else {
+        calendar_description.push(`Generating a calendar for a planet with a year of ${year_days} days`);
     }
-    month_table.append(`<tr>${month_table_header}</tr>`);
+
+    const leap_days = output_calendar.calendar.calendar_parameters.leap.leap_total_days;
+    const leap_period = output_calendar.calendar.calendar_parameters.leap.leap_period;
+    calendar_description.push(`Calendar has approximately ${leap_days} leap days every ${leap_period} years.`);
+
+    const moon_day_period = output_calendar.calendar.calendar_parameters.moon_day_period;
+    if (planetToEarthDays != 1) {
+        let moon_earth_days = moon_day_period * planetToEarthDays;
+        calendar_description.push(`Principal Moon Period is ${moon_day_period} (about ${moon_earth_days} Earth Days)`);
+    } else {
+        calendar_description.push(`Principal Moon Period is ${moon_day_period}`);
+    }
+
+    const lunar_months = output_calendar.calendar.calendar_parameters.months_per_year;
+    calendar_description.push(`Based on the principal satellite, we can subdivide the year into ${lunar_months} lunar months.`);
+    let days_remainder = year_days - lunar_months * output_calendar.calendar.calendar_parameters.base_days_per_month;
+    calendar_description.push(`This leaves us with ${days_remainder} days to be distributed.`);
+
+    return calendar_description;
 }
 
-function generateMonthTableContents(month_table: JQuery, starting_week_day: number, days_per_week, days_per_month: number[], current_month: number, season_days = undefined): number {
-    let week_d = starting_week_day;
-    let m = current_month;
-    let table_day_index = -(week_d % days_per_week); // This is used for aligning the first day to the current week day.
-    let row_day_split = 0;
-    let month_week_line = ""
-    // Fill the empty cells at the begining of the month.
-    // This depends on the starting week day for the current month.
-    while (table_day_index < 0) {
-        month_week_line += "<td></td>";
-        row_day_split++;
-        table_day_index++;
-    }
-    // Now fill the actual table.
-    for (let dm = 0; dm < days_per_month[m]; dm++) {
-        if (season_days === dm) {
-            month_week_line += `<td style="color: red">${dm + 1}</td>`;
-        } else {
-            month_week_line += `<td>${dm + 1}</td>`;
-        }
-        table_day_index++;
-        week_d++;
-        row_day_split++;
-        if (row_day_split >= days_per_week) {
-            row_day_split = row_day_split - days_per_week;
-            month_table.append(`<tr>${month_week_line}</tr>`);
-            month_week_line = "";
-        }
-    }
-    // Fill the remaining cells in the last row (if any).
-    while (row_day_split != 0 && row_day_split < days_per_week) {
-        month_week_line += "<td></td>";
-        row_day_split++;
-        table_day_index++;
-    }
-    if (month_week_line != "") {
-        month_table.append(`<tr>${month_week_line}</tr>`);
-    }
-    return week_d % days_per_week;
-}
-
-function instantiateCalendar(calendar: CalendarGeneratorOutput, days_per_week: number, seasons: SeasonsParameters) {
-    $("#calendar-example div").remove();
-    const calendar_parameter = calendar.calendar_parameters;
-
-    const year_days = calendar_parameter.days_per_year;
-    const months = calendar_parameter.months_per_year;
-    const month_base_days = calendar_parameter.base_days_per_month;
-
-    let day_names = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"];
-
-    // Allocate all the spare days into random months.
-    let days_remainder = year_days - months * month_base_days;
-    let days_per_month = [];
-    for (let i = 0; i < months; i++) {
-        days_per_month.push(month_base_days);
-    }
-    for (let i = 0; i < days_remainder; i++) {
-        days_per_month[Math.floor(Math.random() * months)] += 1;
-    }
-    console.log("[DEBUG] Days per Month: ")
-    console.log(days_per_month);
-    console.log(seasons);
-
-    let spring_equinox = Math.floor(seasons.spring_equinox / 86400); // TODO: Get this from the parameter.
-    let spring_month = 0;
-    for (let i = 0; i < months; i++) {
-        if (spring_equinox < days_per_month[i]) {
-            break;
-        }
-        spring_equinox -= days_per_month[i];
-        spring_month = i;
-    }
-
-    let summer_solstice = Math.floor(seasons.summer_solstice / 86400); // TODO: Get this from the parameter.
-    let summer_month = 0;
-    for (let i = 0; i < months; i++) {
-        if (summer_solstice < days_per_month[i]) {
-            break;
-        }
-        summer_solstice -= days_per_month[i];
-        summer_month = i;
-    }
-
-    let autumn_equinox = Math.floor(seasons.autumn_equinox / 86400); // TODO: Get this from the parameter.
-    let autumn_month = 0;
-    for (let i = 0; i < months; i++) {
-        if (autumn_equinox < days_per_month[i]) {
-            break;
-        }
-        autumn_equinox -= days_per_month[i];
-        autumn_month = i;
-    }
-
-    let winter_solstice = Math.floor(seasons.winter_solstice / 86400); // TODO: Get this from the parameter.
-    let winter_month = 0;
-    for (let i = 0; i < months; i++) {
-        if (winter_solstice < days_per_month[i]) {
-            break;
-        }
-        winter_solstice -= days_per_month[i];
-        winter_month = i;
-    }
-
-    calendar.description.push(`Spring Equinox occurs in the ${spring_month + 1}th month on the ${spring_equinox + 1}th day.`);
-    calendar.description.push(`Summer Solstice occurs in the ${summer_month + 1}th month on the ${summer_solstice + 1}th day.`);
-    calendar.description.push(`Spring Equinox occurs in the ${autumn_month + 1}th month on the ${autumn_equinox + 1}th day.`);
-    calendar.description.push(`Spring Equinox occurs in the ${winter_month + 1}th month on the ${winter_solstice + 1}th day.`);
-
-    console.log(`SpringEquinox = ${spring_month} ${spring_equinox + 1}th`);
-
-    let week_d = 0
-    for (let m = 0; m < months; m++) {
-        let month_div = $(`<div class="month"></div>`);
-        month_div.append(`<h4>Month ${m + 1}</h4>`)
-        let month_table = $(`<table border="1"></table>`);
-        generateMonthTableHeader(month_table, days_per_week, day_names);
-
-        if (m === spring_month)
-            week_d = generateMonthTableContents(month_table, week_d, days_per_week, days_per_month, m, spring_equinox);
-        else
-            week_d = generateMonthTableContents(month_table, week_d, days_per_week, days_per_month, m);
-
-        month_table.appendTo(month_div);
-        month_div.appendTo("#calendar-example");
-    }
-}
-
+/**
+ * Computes the continued fraction representation of a given number.
+ * @param num The input fractional number 
+ * @param order The desired order of the continued fraction
+ */
 function continuedFractions(num: number, order: number): Array<number> {
-    let result = [];
+    let result: Array<number> = [];
     let remainer = num;
     let f = 0;
     for (let i = 0; i <= order; i++) {
@@ -256,18 +194,16 @@ function continuedFractions(num: number, order: number): Array<number> {
     return result;
 }
 
+/**
+ * Compute the third-order convergent for a number expressed as a continued fraction.
+ * @param cf The continued fractions representation of a number.
+ * @returns The numerator and denominator of the third-order convergent.
+ */
 function thirdOrderConvergent(cf: Array<number>): [number, number] {
     return [cf[3] * cf[2] * cf[1] + 1, cf[3] * (cf[2] * cf[1] + 1) + cf[1]];
 }
 
 // SEASONS
-
-interface SeasonsParameters {
-    spring_equinox: number, /// Time in seconds for the first equinox.
-    summer_solstice: number,
-    autumn_equinox: number,
-    winter_solstice: number
-}
 
 export function computeSeasons(axial_tilt: number, A: number, B: number, eccentricity: number, period: number): SeasonsParameters {
     let E = Newton.NewtonRoot(

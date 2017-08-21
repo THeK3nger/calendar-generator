@@ -200,7 +200,7 @@ class SeasonDiagram {
             { startAngle: -this.equinox_angle - Math.PI, endAngle: -this.equinox_angle - (3 / 2) * Math.PI, id: "winter-bar", color: "#3333DD", name: "Winter" }
         ];
 
-        var arc = d3.arc()
+        let arc = d3.arc()
             .innerRadius(100)
             .outerRadius(110);
 

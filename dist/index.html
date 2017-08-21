@@ -13,6 +13,9 @@
   <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
     crossorigin="anonymous"></script>
   <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react@15/dist/react.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>  
+
   <script src="app.js"></script>
 
   <link rel="stylesheet" href="css/styles.css">
@@ -22,58 +25,21 @@
 
 <body>
   <h1>Calendar Generator</h1>
-  <div id="visualization"></div>
-  <div id="generator">
-    <div id="input">
-      <form id="formInputs">
-        <p>
-          Star Mass (Kg):
-          <input type="text" id="starmass">
-        </p>
-        <p>
-          Planet Mass (Kg):
-          <input type="text" id="planetmass">
-        </p>
-        <p>
-          Planet Perihelion (Km):
-          <input type="text" id="planetperihelion">
-        </p>
-        <p>
-          Planet Aphelion (Km):
-          <input type="text" id="planetaphelion">
-        </p>
-        <p>
-          Planet's Day Duration in Seconds:
-          <input type="number" id="dayduration">
-        </p>
-        <p>
-          Moon Mass (Kg):
-          <input type="text" id="moonmass">
-        </p>
-        <p>
-          Moon Perigee (Km):
-          <input type="text" id="moonperigee">
-        </p>
-        <p>
-          Moon Apogee (Km):
-          <input type="text" id="moonapogee">
-        </p>
-        <p><button id="generateButton" type="button">Generate</button></p>
-      </form>
-    </div>
-    <div>
-      <h2>Calendar Description</h2>
-      <div id="calendar-description">
-      </div>
-    </div>
-    <div>
-      <h2>Calendar Example</h2>
-      <div id="calendar-example">
-      </div>
+  <div id="calendar-generator">
+    <div id="visualization"></div>
+    <div id="generator">
     </div>
   </div>
   <div i="changelog">
     <h3>Changelog</h3>
+    <h4>Version 0.3</h4>
+    <ul>
+      <li>Application rewritten in React</li>
+    </ul>
+    <h4>Version 0.2</h4>
+    <ul>
+      <li>Introduced Seasons and Visualization</li>
+    </ul>
     <h4>Version 0.1</h4>
     <ul>
       <li>First Basic Version</li>
@@ -81,7 +47,7 @@
   </div>
 
   <a href="https://github.com/THeK3nger/calendar-generator"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
-  <<script>
+  <script>
     window.onload = function() {
       CalendarGeneratorApp.init();
     }
