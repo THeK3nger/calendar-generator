@@ -4,6 +4,8 @@ body {
     color: #dcdcdc;
 }
 
+
+
 /* Input Text Fields */
 input[type="text"] {
     padding: 5px;
@@ -16,3 +18,26 @@ input[type="text"].focus {
     border: solid 1px #707070;
     box-shadow: 0 0 5px 1px #969696;
 }
+
+#generator {
+	display: flex;
+	padding: 10px;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+div#generator > div {
+	width: 100%;
+	display: flex;
+}
+
+#input {
+	/* float: left; */
+	width: 350px;
+	margin-right: 15px;
+}
+
+#calendar-description {
+	padding: 10px;
+}
+
