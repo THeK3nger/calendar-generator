@@ -1,41 +1,64 @@
 import * as Physic from "./physic"
 import * as Newton from "./newton"
 
+/**
+ * `OrbitalBody` defines data representing information about an orbiting body of the solar system.
+ * 
+ * This can be referred to a planet orbiting around a star, or a satellite orbiting a planet.
+ */
 interface OrbitalBody {
-    mass: number
-    rotation: number
-    orbit: OrbitalParameters
-}
-
-interface SystemParameters {
-    planet: OrbitalBody
-    star_mass: number
-    satellites: Array<OrbitalBody>
+    mass: number                /// The orbital body mass in Kg.
+    rotation: number            /// The rotation period in seconds.
+    orbit: OrbitalParameters    /// The orbital parameters.
+    axial_tilt?: number         /// Axial tilt for the body rotation wrt the orbital plane.
 }
 
 /**
- * Define the orbital parameters in a two-body problem.
+ * `SystemParameters` describes the parameters for a planet in star system.
+ * 
+ * It includes the star mass, and the planet and satellites orbital information.
+ */
+interface SystemParameters {
+    planet: OrbitalBody             /// The planet.
+    star_mass: number               /// The orbiting star mass in Kg.
+    satellites: Array<OrbitalBody>  /// A list of satellites.
+}
+
+/**
+ * Define the orbital parameters for an orbital body.
  */
 interface OrbitalParameters {
-    periapsis: number,
-    apoapsis: number,
-    inclination?: number,
+    periapsis: number       /// The celestial body orbit periapsis in meters.
+    apoapsis: number        /// The celestial body orbit apopasis in meters.
+    inclination?: number    /// The inclination of the orbital plane respect to the system reference plane.
 }
 
+/**
+ * The output data for the actual calendar.
+ */
 interface CalendarParameters {
-    days_per_year: number,
-    moon_day_period: number,
-    months_per_year: number,
-    base_days_per_month: number,
-    leap: LeapYearData
+    days_per_year: number           /// Number of days in a year.
+    moon_day_period: number         /// Number of days in a principal moon revolution.
+    months_per_year: number         /// How many moon revolutions there are in a year.
+    base_days_per_month: number     /// Number of days in a principal moon revolution (floored). // TODO: This is probably superfluous.
+    leap: LeapYearData              /// Information about leap days.
 }
 
+/**
+ * Represent LeapYear information. 
+ */
 interface LeapYearData { leap_total_days: number, leap_period: number }
 
+/**
+ * Output of the calendar generator. // TODO: Probably superfluous.
+ */
 export interface CalendarGeneratorOutput {
     calendar_parameters: CalendarParameters
 }
 
+/**
+ * Computed astronomical season-related events.
+ */
 export interface SeasonsParameters {
     spring_equinox: number, /// Time in seconds for the first equinox.
     summer_solstice: number,
@@ -43,11 +66,19 @@ export interface SeasonsParameters {
     winter_solstice: number
 }
 
+/**
+ * Encapsulate the global generator output.
+ */
 export interface GeneratorOutput {
     calendar: CalendarGeneratorOutput,
     seasons: SeasonsParameters
 }
 
+/**
+ * The main calendar generator function
+ * @param system_data The input star system data for the planet.
+ * @returns An instance of a generated calendar for the planet.
+ */
 export function generateCalendarFromOrbit(system_data: SystemParameters): GeneratorOutput {
     const planet_apoapsis = system_data.planet.orbit.apoapsis;
     const planet_periapsis = system_data.planet.orbit.periapsis;
@@ -106,6 +137,12 @@ function generateCalendarFromPeriod(planet_period: number, moon_periods: Array<n
     return { calendar_parameters: output_parameters };
 }
 
+/**
+ * Given the input and the output, produces a textual description of the planet calendar.
+ * @param input_parameters The star system input parameters.
+ * @param output_calendar The output of the calendar generation.
+ * @returns A textual description of the planed calendar.
+ */
 export function describeCalendar(input_parameters: SystemParameters, output_calendar: GeneratorOutput): Array<string> {
     let calendar_description: Array<string> = [];
 
@@ -139,6 +176,11 @@ export function describeCalendar(input_parameters: SystemParameters, output_cale
     return calendar_description;
 }
 
+/**
+ * Computes the continued fraction representation of a given number.
+ * @param num The input fractional number 
+ * @param order The desired order of the continued fraction
+ */
 function continuedFractions(num: number, order: number): Array<number> {
     let result: Array<number> = [];
     let remainer = num;
@@ -152,6 +194,11 @@ function continuedFractions(num: number, order: number): Array<number> {
     return result;
 }
 
+/**
+ * Compute the third-order convergent for a number expressed as a continued fraction.
+ * @param cf The continued fractions representation of a number.
+ * @returns The numerator and denominator of the third-order convergent.
+ */
 function thirdOrderConvergent(cf: Array<number>): [number, number] {
     return [cf[3] * cf[2] * cf[1] + 1, cf[3] * (cf[2] * cf[1] + 1) + cf[1]];
 }
