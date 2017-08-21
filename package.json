@@ -1,4 +1,13 @@
 {
+  "version": "0.3.0",
+  "author": {
+    "email": "thek3nger@gmail.com",
+    "name": "Davide Aversa"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:THeK3nger/calendar-generator.git"
+  },
   "scripts": {
     "start": "http-server ./dist -p 8080",
     "test": "mocha -r ts-node/register --require amd-loader ./tests/**/*",
