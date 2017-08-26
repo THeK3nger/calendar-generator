@@ -214,7 +214,7 @@ class SeasonDiagram {
             .style("fill", (d) => d.color);
 
         season_bars.exit().remove();
-
+    
         season_bars.transition().duration(750)
             .attr("transform", `translate(${this.sun.cx},${this.sun.cy})`)
             .attr("d", arc);
@@ -222,13 +222,13 @@ class SeasonDiagram {
         let season_names = this.parent.selectAll(".season-name").data(bars_data);
 
         season_names.enter().append("text")
-            .attr("x", 100)   // TODO: Make this dynamic.
+            .style("text-anchor", "middle") //place the text halfway on the arc
+            .attr("dx", 100)   // TODO: Make this dynamic.
             .attr("dy", 18)
             .attr("class", "season-name")
             .append("textPath") //append a textPath to the text element
             .attr("xlink:href", (d) => `#${d.id}`) //place the ID of the path here
-            .style("text-anchor", "middle") //place the text halfway on the arc
-            .attr("startOffset", "50%")
+            //.attr("startOffset", "50%")
             .text((d) => d.name);
 
         season_names.exit().remove();
