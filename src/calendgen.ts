@@ -45,6 +45,19 @@ interface CalendarParameters {
 }
 
 /**
+ * Store information on the lunar phases of a single moon.
+ * 
+ * All time correspond to the FIRST occurrence from time zero.
+ * Values are expressed in seconds.
+ */
+interface LunarPhases {
+    full_moon: number
+    new_moon: number
+    third_quart: number
+    first_quart: number
+}
+
+/**
  * Represent LeapYear information. 
  */
 interface LeapYearData { leap_total_days: number, leap_period: number }
@@ -219,5 +232,38 @@ export function computeSeasons(axial_tilt: number, A: number, B: number, eccentr
         autumn_equinox: (period / (2 * Math.PI)) * (E3 - eccentricity * Math.sin(E3)),
         winter_solstice: (period / (2 * Math.PI)) * (E4 - eccentricity * Math.sin(E4))
     };
+
+}
+
+// LUNAR PHASES
+export function computeLunarPhases(planet: OrbitalBody, moon: OrbitalBody, calendar: CalendarGeneratorOutput): LunarPhases {
+    const moon_period = calendar.calendar_parameters.moon_day_period;
+    // Compute first full moon.
+    // Full moons occurs when the moon is aligned with the SUN-PLANET axis.
+    // This is equivalent of saying that the full moon occurs when the  true anomaly of the moon orbit is 0.
+    // FM = kP (where P is the orbital period and k is an integer)
+    const full_moon_time = 0;
+    // Compute first new moon.
+    // This occurs when the moon is in opposition to the SUN-PLANET axis.
+    // This is equivalent of saying that the new moon occurs when the true anomaly of the moon orbit is PI.
+    // NM = P/2 + kP
+    // (Note that Mean Anomaly, Eccentric Anomaly and True Anomaly are equivalent on 0 and PI)
+    const new_moon_time = moon_period / 2;
+    // Compute the third quart.
+    // this occur when MOON-PLANET axis is perpendicular to the SUN-PLANET orbit.
+    // This is equivalent of saying that the third quarter occurs when the true anomaly of the moon orbit is PI/2.
+    // In this case MA, EA, and TA **do not match**. The formula is more complex.
+    const moon_apoapsis = moon.orbit.apoapsis;
+    const moon_periapsis = moon.orbit.periapsis;
+    const e = (moon_apoapsis - moon_periapsis) / (moon_apoapsis + moon_periapsis);
+    const gamma = Math.sqrt((1+e)/(1-e));
+    const third_quart_time = moon_period * (1/Math.PI) * Math.atan(1/gamma) - e * ((2*gamma)/(gamma*gamma)+1);
+    // Compute the first quart.
+    // this occur when MOON-PLANET axis is anti-perpendicular to the SUN-PLANET orbit.
+    // This is equivalent of saying that the third quarter occurs when the true anomaly of the moon orbit is -PI/2.
+    // In this case MA, EA, and TA **do not match**. The formula is more complex.
+    const first_quart_time = -third_quart_time + moon_period; // TODO: Check this.
+
+    return { full_moon: full_moon_time, new_moon: new_moon_time, first_quart: first_quart_time, third_quart: third_quart_time };
 
 }
