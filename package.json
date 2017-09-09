@@ -29,7 +29,7 @@
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "ts-node": "^3.0.4",
-    "typescript": "^2.3.4"
+    "typescript": "^2.5.2"
   },
   "devDependencies": {
     "ts-loader": "^2.3.2",
