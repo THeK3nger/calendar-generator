@@ -48,7 +48,7 @@ export class CalendarGenerator extends React.Component<{}, CalendarGeneratorStat
         console.log("Click Received. Starting Calendar Generation.");
         let star_mass = this.state.input_values.star_mass;
         let planet_mass = this.state.input_values.planet_mass;
-        let planet_perihelion = this.state.input_values.planet_aphelion * 1000;
+        let planet_perihelion = this.state.input_values.planet_perihelion * 1000;
         let planet_aphelion = this.state.input_values.planet_aphelion * 1000;
         let moon_mass = this.state.input_values.moon_mass;
         let moon_perigee = this.state.input_values.moon_perigee * 1000;
