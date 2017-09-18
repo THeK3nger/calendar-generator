@@ -32,14 +32,14 @@ export class OrbitCanvas {
     }
 
     draw_seasons(e: number, equinox_angle: number) {
-        let a = (this.width / 2) - 60;
-        let b = a * Math.sqrt(1 - e * e);
+        //let a = (this.width / 2) - 60;
+        //let b = a * Math.sqrt(1 - e * e);
 
-        let focus = a * e;
+        //let focus = a * e;
 
         // Compute equinox line.
-        let x = 250 * Math.cos(equinox_angle);
-        let y = -250 * Math.sin(equinox_angle);
+        //let x = 250 * Math.cos(equinox_angle);
+        //let y = -250 * Math.sin(equinox_angle);
 
         if (!this.seasons) {
             this.seasons = new SeasonDiagram(this.season_canvas, this.star, equinox_angle);
@@ -214,7 +214,7 @@ class SeasonDiagram {
             .style("fill", (d) => d.color);
 
         season_bars.exit().remove();
-    
+
         season_bars.transition().duration(750)
             .attr("transform", `translate(${this.sun.cx},${this.sun.cy})`)
             .attr("d", arc);

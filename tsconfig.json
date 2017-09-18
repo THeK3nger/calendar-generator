@@ -6,7 +6,8 @@
         "sourceMap": true,
         "outDir": "./dist/",
         "strict": true,
-        "jsx": "react"
+        "jsx": "react",
+        "noUnusedLocals": true
     },
     "files": [
         "src/app.ts",

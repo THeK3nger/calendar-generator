@@ -54,16 +54,18 @@ export class CalendarGenerator extends React.Component<{}, CalendarGeneratorStat
         let moon_perigee = this.state.input_values.moon_perigee * 1000;
         let moon_apogee = this.state.input_values.moon_apogee * 1000;
         let day_duration = this.state.input_values.day_duration;
+        let star = { mass: star_mass }
+        let planet = {
+            mass: planet_mass,
+            rotation: day_duration,
+            orbit: {
+                periapsis: planet_perihelion,
+                apoapsis: planet_aphelion,
+                central_body: star
+            }
+        };
         let system_parameters = {
-            planet: {
-                mass: planet_mass,
-                rotation: day_duration,
-                orbit: {
-                    periapsis: planet_perihelion,
-                    apoapsis: planet_aphelion,
-                }
-            },
-            star_mass: star_mass,
+            planet: planet,
             satellites: [
                 {
                     mass: moon_mass,
@@ -71,6 +73,7 @@ export class CalendarGenerator extends React.Component<{}, CalendarGeneratorStat
                     orbit: {
                         periapsis: moon_perigee,
                         apoapsis: moon_apogee,
+                        central_body: planet
                     }
                 }
             ]
