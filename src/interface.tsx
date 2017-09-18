@@ -114,7 +114,7 @@ export class CalendarGenerator extends React.Component<{}, CalendarGeneratorStat
             <div>
                 <GeneratorInput {...extend(this.initial_state, { onClick: () => this.runGeneration(), onChange: (id, v) => this.handleInputUpdate(id, v) }) } />
                 <CalendarDescription description={this.state.description} />
-                {(this.state.calendar_data !== null) ? <CalendarExample calendar={this.state.calendar_data.calendar} days_per_week={7} seasons={this.state.calendar_data.seasons} /> : false}
+                {(this.state.calendar_data !== null) ? <CalendarExample calendar={this.state.calendar_data.calendar} days_per_week={7} seasons={this.state.calendar_data.seasons} lunar_phases={this.state.calendar_data.lunar_phases} /> : false}
             </div>
         );
     }
