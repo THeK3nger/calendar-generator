@@ -41,3 +41,12 @@ div#generator > div {
 	padding: 10px;
 }
 
+/* Calendexample */
+table tbody tr td div.calenday {
+	width: 40px;
+}
+
+table  div.calenday span {
+	display: inline-block;
+	width: 20px;
+}

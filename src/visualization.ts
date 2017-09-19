@@ -32,14 +32,14 @@ export class OrbitCanvas {
     }
 
     draw_seasons(e: number, equinox_angle: number) {
-        let a = (this.width / 2) - 60;
-        let b = a * Math.sqrt(1 - e * e);
+        //let a = (this.width / 2) - 60;
+        //let b = a * Math.sqrt(1 - e * e);
 
-        let focus = a * e;
+        //let focus = a * e;
 
         // Compute equinox line.
-        let x = 250 * Math.cos(equinox_angle);
-        let y = -250 * Math.sin(equinox_angle);
+        //let x = 250 * Math.cos(equinox_angle);
+        //let y = -250 * Math.sin(equinox_angle);
 
         if (!this.seasons) {
             this.seasons = new SeasonDiagram(this.season_canvas, this.star, equinox_angle);
@@ -222,13 +222,13 @@ class SeasonDiagram {
         let season_names = this.parent.selectAll(".season-name").data(bars_data);
 
         season_names.enter().append("text")
-            .attr("x", 100)   // TODO: Make this dynamic.
+            .style("text-anchor", "middle") //place the text halfway on the arc
+            .attr("dx", 100)   // TODO: Make this dynamic.
             .attr("dy", 18)
             .attr("class", "season-name")
             .append("textPath") //append a textPath to the text element
             .attr("xlink:href", (d) => `#${d.id}`) //place the ID of the path here
-            .style("text-anchor", "middle") //place the text halfway on the arc
-            .attr("startOffset", "50%")
+            //.attr("startOffset", "50%")
             .text((d) => d.name);
 
         season_names.exit().remove();

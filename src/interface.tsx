@@ -54,16 +54,18 @@ export class CalendarGenerator extends React.Component<{}, CalendarGeneratorStat
         let moon_perigee = this.state.input_values.moon_perigee * 1000;
         let moon_apogee = this.state.input_values.moon_apogee * 1000;
         let day_duration = this.state.input_values.day_duration;
+        let star = { mass: star_mass }
+        let planet = {
+            mass: planet_mass,
+            rotation: day_duration,
+            orbit: {
+                periapsis: planet_perihelion,
+                apoapsis: planet_aphelion,
+                central_body: star
+            }
+        };
         let system_parameters = {
-            planet: {
-                mass: planet_mass,
-                rotation: day_duration,
-                orbit: {
-                    periapsis: planet_perihelion,
-                    apoapsis: planet_aphelion,
-                }
-            },
-            star_mass: star_mass,
+            planet: planet,
             satellites: [
                 {
                     mass: moon_mass,
@@ -71,6 +73,7 @@ export class CalendarGenerator extends React.Component<{}, CalendarGeneratorStat
                     orbit: {
                         periapsis: moon_perigee,
                         apoapsis: moon_apogee,
+                        central_body: planet
                     }
                 }
             ]
@@ -114,7 +117,7 @@ export class CalendarGenerator extends React.Component<{}, CalendarGeneratorStat
             <div>
                 <GeneratorInput {...extend(this.initial_state, { onClick: () => this.runGeneration(), onChange: (id, v) => this.handleInputUpdate(id, v) }) } />
                 <CalendarDescription description={this.state.description} />
-                {(this.state.calendar_data !== null) ? <CalendarExample calendar={this.state.calendar_data.calendar} days_per_week={7} seasons={this.state.calendar_data.seasons} /> : false}
+                {(this.state.calendar_data !== null) ? <CalendarExample calendar={this.state.calendar_data.calendar} days_per_week={7} seasons={this.state.calendar_data.seasons} lunar_phases={this.state.calendar_data.lunar_phases} /> : false}
             </div>
         );
     }

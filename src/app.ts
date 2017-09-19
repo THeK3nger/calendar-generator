@@ -2,7 +2,7 @@ import * as log from 'loglevel'
 
 import * as GeneratorUI from "./interface"
 
-const VERSION = "v0.3.0";
+const VERSION = "v0.4.0";
 
 export function init() {
     log.setLevel("debug");

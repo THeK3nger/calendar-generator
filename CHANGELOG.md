@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+
+## [0.4.0] - 2017-09-20
+
+### Added 
+
+ - **New! Lunar Phases** Now the calendar generate lunar phases for the principal satellite!
+
 ## [0.3.0] - 2017-08-21
 
 ### Changed
