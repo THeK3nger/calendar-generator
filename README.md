@@ -30,7 +30,7 @@ I will address the problem with such exotic planets in the future.
 
 ## Feature Backlog
 
-- [ ] Lunar Phases
+- [x] Lunar Phases
 - [x] Seasons
 - [ ] Astrological Features (zodiac-like)
 - [ ] Multi-Year Cycles (e.g., like in the Chinese Calendar)
