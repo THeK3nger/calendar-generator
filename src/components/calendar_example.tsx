@@ -48,44 +48,32 @@ export class CalendarExample extends React.Component<CalendarExampleProps, {}> {
         return months;
     }
 
+    monthly_phases(previous_phase: number, days_in_month: number): Array<number> {
+        let result: Array<number> = [];
+        let current = previous_phase;
+        while (current < days_in_month) {
+            if (current >= 0 && current < days_in_month) {
+                result.push(current);
+            }
+            current += this.props.calendar.calendar_parameters.base_days_per_month;
+        }
+        return result;
+    }
+
+    lunar_phase_remainder(plist: Array<number>, days_in_month: number, moon_period: number): number {
+        return plist[plist.length - 1] + moon_period - days_in_month;
+    }
+
     compute_next_lunar_phases(previous: LunarPhases, days_in_month: number): { mlp: MonthLunarPhases, next: LunarPhases } {
         const moon_period = this.props.calendar.calendar_parameters.base_days_per_month;
-        let fm = previous.full_moon;
-        let nfmlist: Array<number> = [];
-        while (fm < days_in_month) {
-            if (fm >= 0 && fm < days_in_month) {
-                nfmlist.push(fm);
-            }
-            fm += moon_period;
-        }
-        let nm = previous.new_moon;
-        let nnmlist: Array<number> = [];
-        while (nm < days_in_month) {
-            if (nm >= 0 && nm < days_in_month) {
-                nnmlist.push(nm);
-            }
-            nm += moon_period;
-        }
-        let fq = previous.first_quart;
-        let fqmlist: Array<number> = [];
-        while (fq < days_in_month) {
-            if (fq >= 0 && fq < days_in_month) {
-                fqmlist.push(fq);
-            }
-            fq += moon_period;
-        }
-        let tq = previous.third_quart;
-        let tqmlist: Array<number> = [];
-        while (tq < days_in_month) {
-            if (tq >= 0 && tq < days_in_month) {
-                tqmlist.push(tq);
-            }
-            tq += moon_period;
-        }
-        const nfm = fm - days_in_month;
-        const nnm = nm - days_in_month;
-        const fqm = fq - days_in_month;
-        const tqm = tq - days_in_month;
+        let nfmlist = this.monthly_phases(previous.full_moon, days_in_month);
+        let nnmlist = this.monthly_phases(previous.new_moon, days_in_month);
+        let fqmlist = this.monthly_phases(previous.first_quart, days_in_month);
+        let tqmlist = this.monthly_phases(previous.third_quart, days_in_month);
+        const nfm = this.lunar_phase_remainder(nfmlist, days_in_month, moon_period);
+        const nnm = this.lunar_phase_remainder(nnmlist, days_in_month, moon_period);
+        const fqm = this.lunar_phase_remainder(fqmlist, days_in_month, moon_period);
+        const tqm = this.lunar_phase_remainder(tqmlist, days_in_month, moon_period);
         return {
             mlp: {
                 full_moon: nfmlist,
@@ -141,17 +129,16 @@ export class MonthTable extends React.Component<MonthTableProps, {}> {
     }
 
     select_phases(day: number, phases: MonthLunarPhases): string {
-        console.log(phases);
-        if (phases.full_moon.indexOf(day -1) !== -1) {
+        if (phases.full_moon.indexOf(day - 1) !== -1) {
             return "🌕";
         }
-        if (phases.new_moon.indexOf(day -1) !== -1) {
+        if (phases.new_moon.indexOf(day - 1) !== -1) {
             return "🌑";
         }
-        if (phases.first_quart.indexOf(day -1) !== -1) {
+        if (phases.first_quart.indexOf(day - 1) !== -1) {
             return "🌓";
         }
-        if (phases.third_quart.indexOf(day -1) !== -1) {
+        if (phases.third_quart.indexOf(day - 1) !== -1) {
             return "🌗";
         }
         return " ";
