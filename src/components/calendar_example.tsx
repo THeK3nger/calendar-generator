@@ -219,7 +219,7 @@ export class MonthTable extends React.Component<MonthTableProps, {}> {
     render() {
         return (
             <div>
-                <h4>Month {this.props.id}</h4>
+                <h4>Month {this.props.id + 1}</h4>
                 <table>
                     {this.renderMonthHeader()}
                     {this.renderMonthBody()}
