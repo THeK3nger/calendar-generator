@@ -49,9 +49,6 @@ export class CalendarExample extends React.Component<CalendarExampleProps, {}> {
     }
 
     compute_next_lunar_phases(previous: LunarPhases, days_in_month: number): { mlp: MonthLunarPhases, next: LunarPhases } {
-        console.log("INPUT: ");
-        console.log(previous);
-        console.log("...")
         const moon_period = this.props.calendar.calendar_parameters.base_days_per_month;
         let fm = previous.full_moon;
         let nfmlist: Array<number> = [];
@@ -69,7 +66,7 @@ export class CalendarExample extends React.Component<CalendarExampleProps, {}> {
             }
             nm += moon_period;
         }
-        let fq = previous.new_moon;
+        let fq = previous.first_quart;
         let fqmlist: Array<number> = [];
         while (fq < days_in_month) {
             if (fq >= 0 && fq < days_in_month) {
@@ -77,7 +74,7 @@ export class CalendarExample extends React.Component<CalendarExampleProps, {}> {
             }
             fq += moon_period;
         }
-        let tq = previous.new_moon;
+        let tq = previous.third_quart;
         let tqmlist: Array<number> = [];
         while (tq < days_in_month) {
             if (tq >= 0 && tq < days_in_month) {
@@ -129,8 +126,8 @@ interface MonthTableProps extends React.Props<{}> {
 
 export class MonthTable extends React.Component<MonthTableProps, {}> {
 
-    renderCell(name: string, id: string = name) {
-        return <td key={id}>{name}</td>;
+    renderCell(name: string, id: string = name, symbol: string = " ") {
+        return <td key={id}><div className="calenday"><span>{symbol}</span>{name}</div></td>;
     }
 
     renderMonthHeader() {
@@ -144,20 +141,17 @@ export class MonthTable extends React.Component<MonthTableProps, {}> {
     }
 
     select_phases(day: number, phases: MonthLunarPhases): string {
+        console.log(phases);
         if (phases.full_moon.indexOf(day -1) !== -1) {
-            console.log(`${day} is full moon`);
             return "🌕";
         }
         if (phases.new_moon.indexOf(day -1) !== -1) {
-            console.log(`${day} is full moon`);
             return "🌑";
         }
         if (phases.first_quart.indexOf(day -1) !== -1) {
-            console.log(`${day} is full moon`);
             return "🌓";
         }
         if (phases.third_quart.indexOf(day -1) !== -1) {
-            console.log(`${day} is full moon`);
             return "🌗";
         }
         return " ";
@@ -178,7 +172,7 @@ export class MonthTable extends React.Component<MonthTableProps, {}> {
         }
         while (idx < ending) {
             let phase = this.select_phases(current_day, this.props.lunar_phases);
-            week.push(this.renderCell(phase + " " + current_day.toString(), idx.toString()));
+            week.push(this.renderCell(current_day.toString(), idx.toString(), phase));
             idx++;
             current_day++;
         }
