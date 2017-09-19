@@ -148,6 +148,7 @@ export class MonthTable extends React.Component<MonthTableProps, {}> {
         // If empty_start > 0 fill the empty cells at the beginning of week.
         // If empty_end > 0 fill the empty cells at the end of the week.
         // Only one between empty start and empty end can be > 0!
+        if (empty_end < 0) throw "empty_end cannot be negative;";
         let week: Array<JSX.Element> = [];
         let starting = empty_start;
         let ending = this.props.days_per_week - empty_end;
@@ -184,8 +185,8 @@ export class MonthTable extends React.Component<MonthTableProps, {}> {
         weeks.push(this.renderMonthWeek(week_num, current_day, this.props.starting_day));
         current_day += this.props.days_per_week - this.props.starting_day;
         week_num++;
-        while (current_day < this.props.month_day) {
-            if (current_day + this.props.days_per_week < this.props.month_day) {
+        while (current_day <= this.props.month_day) {
+            if (current_day + this.props.days_per_week <= this.props.month_day) {
                 weeks.push(this.renderMonthWeek(week_num, current_day));
                 week_num++;
                 current_day += this.props.days_per_week;
