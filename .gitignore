@@ -5,3 +5,8 @@ node_modules
 
 # Ignore minimized output for now
 dist/app.min.js
+
+# Avoid tracking generated files
+# In case of running `tsc` by mistake!
+dist/**/*.js
+dist/**/*.js.map
