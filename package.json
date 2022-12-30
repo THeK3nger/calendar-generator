@@ -25,7 +25,7 @@
     "chai": "^4.2.0",
     "immutability-helper": "^3.0.2",
     "loglevel": "^1.6.8",
-    "mocha": "^7.1.2",
+    "mocha": "^10.2.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "ts-node": "^8.9.1",
